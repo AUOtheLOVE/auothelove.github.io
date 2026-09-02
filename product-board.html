@@ -168,7 +168,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
     </div>
     <div data-pane="one" style="display:flex;flex-direction:column;gap:11px">
       <div class="fld"><label>상품 URL</label>
-        <input id="aUrl" placeholder="https://detail.tmall.com/item.htm?id=... / baroget / mercari"/></div>
+        <input id="aUrl" placeholder="상품 페이지 주소를 붙여넣으세요"/></div>
       <div class="fld"><label>상품명</label><input id="aTitle" placeholder="비워두면 URL에서 자동"/></div>
       <div style="display:flex;gap:9px">
         <div class="fld" style="flex:1"><label>가격</label><input id="aPrice" placeholder="예: 128"/></div>
@@ -180,13 +180,13 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
       <div class="fld"><label>옵션 · 색상 · 사이즈</label><input id="aOpt" placeholder="예: A타입 / 검정"/></div>
       <div class="fld"><label>메모</label><input id="aMemo" placeholder="대신 사줄 사람에게 남길 말"/></div>
       <div class="fld"><label>이미지 URL</label>
-        <input id="aImg" placeholder="img.alicdn.com / static.mercdn.net ..."/></div>
+        <input id="aImg" placeholder="이미지 주소 (있으면)"/></div>
       <div class="drop" id="aDrop">여기에 이미지를 <b>붙여넣기(Ctrl+V)</b> 하거나 파일을 끌어다 놓으세요
         <div id="aDropInfo" style="margin-top:6px;color:var(--acc)"></div></div>
     </div>
     <div data-pane="many" style="display:none;flex-direction:column;gap:11px">
       <div class="fld"><label>URL 한 줄에 하나씩</label>
-        <textarea id="aBulk" style="min-height:170px" placeholder="https://detail.tmall.com/item.htm?id=111&#10;https://jp.mercari.com/item/m222"></textarea></div>
+        <textarea id="aBulk" style="min-height:170px" placeholder="https://...&#10;https://..."></textarea></div>
       <div class="hint">제목·가격·이미지는 나중에 카드에서 바로 고칠 수 있습니다.</div>
     </div>
   </div>
@@ -210,7 +210,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
   <div class="mb">
     <div class="hint">
       <b>1. 상품 모으기</b><br/>
-      아래 <b>담기</b> 버튼을 북마크바로 끌어다 놓으세요. 그다음 바로겟 같은 사이트에서 상품 목록을 보다가
+      아래 <b>담기</b> 버튼을 북마크바로 끌어다 놓으세요. 그다음 상품 목록을 보고 있는 페이지에서
       그 북마크를 누르면, 상품 사진마다 <b>담기</b> 딱지가 붙습니다. 원하는 것만 눌러 고르고
       <b>보드로 보내기</b>를 누르면 이 보드가 새 탭에서 열리면서 바로 들어옵니다.<br/>
       팝업이 막히는 곳에서는 <b>복사</b>를 누른 뒤, 보드에서 <b>붙여넣기 가져오기</b>를 쓰세요.
@@ -299,12 +299,6 @@ const nf=n=>Number(n||0).toLocaleString('ko-KR');
 
 function siteOf(u){
   u=String(u||'');
-  if(/tmall\.com/i.test(u)) return 'Tmall';
-  if(/taobao\.com/i.test(u)) return 'Taobao';
-  if(/1688\.com/i.test(u)) return '1688';
-  if(/mercari/i.test(u)) return 'Mercari';
-  if(/baroget/i.test(u)) return '바로겟';
-  if(/mercaring/i.test(u)) return '메루카링';
   try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return ''; }
 }
 function guessTitle(u){
@@ -312,7 +306,7 @@ function guessTitle(u){
   const k=String(u||'').match(/\/item\/(m?\d+)/); if(k) return siteOf(u)+' '+k[1];
   return siteOf(u)||'상품';
 }
-function curOf(u){ return /mercari|mercaring/i.test(u)?'JPY':'CNY'; }
+function curOf(u){ return /(^|\/\/|\.)jp\./i.test(String(u))?'JPY':'CNY'; }
 function num(v){ const m=String(v==null?'':v).replace(/[^\d.]/g,''); return m?parseFloat(m):0; }
 function krw(it){
   const p=num(it.price)*(it.qty||1);
@@ -381,7 +375,7 @@ function render(){
     g.innerHTML='<div class="empty" style="grid-column:1/-1"><b>아직 담긴 상품이 없습니다</b>'
       +'상단 <code>+ 상품 추가</code>로 링크를 넣거나,<br/>'
       +'<code>도움말 · 북마클릿</code>의 담기 버튼을 북마크바에 두고<br/>'
-      +'바로겟 · 메루카링 상품 목록에서 눌러 보세요.</div>';
+      +'상품 목록 페이지에서 눌러 보세요.</div>';
     sum(); return;
   }
   const ord=[...items].sort((a,b)=>(b.pri-a.pri)||(a.at-b.at));
