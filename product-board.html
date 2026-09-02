@@ -210,9 +210,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
   <div class="mb">
     <div class="hint">
       <b>1. 상품 모으기</b><br/>
-      바로겟·메루카링·타오바오 대행 사이트에서 상품을 보다가, 아래 <b>담기</b> 버튼을 북마크바로 끌어다 놓고
-      상품 목록 페이지에서 눌러 보세요. 각 상품에 체크칸이 생기고, 고른 것을 복사할 수 있습니다.
-      그다음 이 보드에서 <b>붙여넣기 가져오기</b>를 누르면 들어옵니다.
+      아래 <b>담기</b> 버튼을 북마크바로 끌어다 놓으세요. 그다음 바로겟 같은 사이트에서 상품 목록을 보다가
+      그 북마크를 누르면, 상품 사진마다 <b>담기</b> 딱지가 붙습니다. 원하는 것만 눌러 고르고
+      <b>보드로 보내기</b>를 누르면 이 보드가 새 탭에서 열리면서 바로 들어옵니다.<br/>
+      팝업이 막히는 곳에서는 <b>복사</b>를 누른 뒤, 보드에서 <b>붙여넣기 가져오기</b>를 쓰세요.
     </div>
     <div style="text-align:center;padding:6px 0">
       <a class="bmk" id="bmkLink" href="#" onclick="return false">📥 보드에 담기</a>
@@ -841,14 +842,22 @@ list.forEach(function(c,i){
 box=document.createElement('div');
 box.style.cssText='position:fixed;right:16px;bottom:16px;z-index:2147483600;background:#fff;border:1px solid #ddd9d2;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.25);padding:12px 14px;font:13px/1.5 sans-serif;color:#1a1814';
 box.innerHTML='<div style="font-weight:600;margin-bottom:7px">보드에 담기</div><div id="pbc" style="color:#6b6660;margin-bottom:9px">0개 선택</div>'
-+'<button id="pba" style="margin-right:5px">전체</button><button id="pbk" style="margin-right:5px;font-weight:600;color:#9a7c2e">복사</button><button id="pbx">닫기</button>';
++'<button id="pba" style="margin-right:5px">전체</button><button id="pbs" style="margin-right:5px;font-weight:600;color:#fff;background:#9a7c2e;border:1px solid #9a7c2e;border-radius:4px;padding:3px 9px;cursor:pointer">보드로 보내기</button><button id="pbk" style="margin-right:5px">복사</button><button id="pbx">닫기</button>';
 document.body.appendChild(box);
 function cnt(){document.getElementById('pbc').textContent=Object.keys(S).length+'개 선택';}
 document.getElementById('pba').onclick=function(){list.forEach(function(c,i){S[i]=c;});
  picked.forEach(function(w){w.textContent='✓ 담김';w.style.background='#9a7c2e';w.style.color='#fff';});cnt();};
+function grab(){return Object.keys(S).map(function(i){var c=S[i];
+ return {url:c.url,title:c.title,price:c.price,cur:c.cur,img:c.img.currentSrc||c.img.src};});}
+document.getElementById('pbs').onclick=function(){
+ var out=grab();
+ if(!out.length){alert('선택된 상품이 없습니다. 상품 위의 담기 버튼을 먼저 눌러 주세요.');return;}
+ var p=btoa(unescape(encodeURIComponent(JSON.stringify(out))));
+ var w=window.open('__BOARD__#add='+encodeURIComponent(p),'_blank');
+ if(!w){alert('팝업이 막혔습니다. 이 사이트의 팝업을 허용하거나 [복사]를 쓰세요.');}
+};
 document.getElementById('pbk').onclick=function(){
- var out=Object.keys(S).map(function(i){var c=S[i];
-  return {url:c.url,title:c.title,price:c.price,cur:c.cur,img:c.img.currentSrc||c.img.src};});
+ var out=grab();
  if(!out.length){alert('선택된 상품이 없습니다.');return;}
  var t=JSON.stringify(out);
  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject())
@@ -859,8 +868,22 @@ document.getElementById('pbk').onclick=function(){
 window.__pbOff=function(){picked.forEach(function(w){w.remove()});box.remove();window.__pbOn=0;};
 document.getElementById('pbx').onclick=window.__pbOff;
 })();`;
+/* 북마클릿이 주소에 실어 보낸 상품 받기 (#add=base64) */
+function takeHash(){
+  const m=location.hash.match(/[#&]add=([^&]+)/);
+  if(!m) return 0;
+  let list=null;
+  try{ list=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1]))))); }catch(e){}
+  history.replaceState(null,'',location.pathname+location.search);
+  if(!Array.isArray(list)||!list.length){ toast('받은 내용을 읽지 못했습니다.'); return 0; }
+  const n=addItems(list);
+  toast(n?n+'개 담았습니다.':'이미 담겨 있는 상품입니다.');
+  return n;
+}
+
 $('#bHelp').onclick=()=>{
-  const href='javascript:'+encodeURIComponent(BMK.replace(/\n/g,''));
+  const board=location.origin+location.pathname;
+  const href='javascript:'+encodeURIComponent(BMK.replace(/__BOARD__/g,board).replace(/\n/g,''));
   $('#bmkLink').href=href;
   $('#bmkCode').value=href;
   $('#mHelp').classList.add('open');
@@ -869,10 +892,13 @@ $('#bmkCopy').onclick=async ()=>{ await copy($('#bmkCode').value); toast('코드
 
 /* ---------- 시작 ---------- */
 (async function(){
-  load(); bindCfg(); render();
+  load(); bindCfg();
+  takeHash();
+  render();
   await loadFixed(); render();
   fixImages();
 })();
+window.addEventListener('hashchange',()=>{ if(takeHash()) render(); });
 window.imgFail=imgFail;
 </script>
 </body>
