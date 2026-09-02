@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>소분을 하자</title>
+<meta name="description" content="소분 잔여 표시 도구. 굿즈 이미지에 화이트 처리와 +숫자 표식을 올려 남은 자리를 한눈에."/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="소분을 하자"/>
+<meta property="og:title" content="소분을 하자"/>
+<meta property="og:description" content="굿즈 이미지에 화이트 처리와 +숫자 표식을 올려 남은 자리를 한눈에."/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="소분을 하자"/>
+<meta name="twitter:description" content="굿즈 이미지에 화이트 처리와 +숫자 표식을 올려 남은 자리를 한눈에."/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f5f0; --s1:#ffffff; --s2:#f0ede8; --s3:#e8e4de; --line:#ddd9d2;
+  --t1:#1a1814; --t2:#6b6660; --t3:#aaa49e; --acc:#9a7c2e;
+}
+body{
+  background:var(--bg);color:var(--t1);
+  font-family:'Segoe UI','Noto Sans KR',system-ui,sans-serif;
+  height:100vh;display:flex;flex-direction:column;overflow:hidden;
+  font-size:13px;line-height:1.5;
+}
+.topbar{background:var(--s1);border-bottom:1px solid var(--line);padding:9px 14px;
+  display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;position:relative}
+.topbar h1{font-size:14px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.topbar h1 span{color:var(--acc)}
+.btn{background:var(--s2);color:var(--t1);border:1px solid var(--line);border-radius:5px;
+  padding:0 12px;height:30px;line-height:28px;font-size:12px;font-family:inherit;
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;white-space:nowrap;transition:background .1s,border-color .1s;vertical-align:middle}
+.btn:hover{background:var(--s3);border-color:var(--t3)}
+.btn.acc{border-color:var(--acc);color:var(--acc)}
+.btn.acc:hover{background:var(--acc);color:#fff}
+.btn.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.sel-i{background:var(--bg);color:var(--t1);border:1px solid var(--line);border-radius:5px;
+  padding:0 8px;height:30px;font-size:12px;font-family:inherit;max-width:190px;vertical-align:middle}
+.sep{width:1px;height:18px;background:var(--line);margin:0 2px;flex-shrink:0}
+.btn.help{width:30px;padding:0;border-radius:50%;font-weight:700;color:var(--t2)}
+.help-wrap{position:relative;display:inline-flex;align-items:center}
+.help-pop{position:absolute;left:0;top:36px;width:330px;background:var(--s1);
+  border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.14);
+  padding:12px 14px;font-size:12px;line-height:1.75;color:var(--t1);z-index:60;display:none}
+.help-wrap:hover .help-pop,.help-pop.open{display:block}
+.help-pop b{color:var(--acc);font-size:11.5px;letter-spacing:.02em}
+.help-pop ul{margin:2px 0 9px;padding-left:16px}
+.help-pop li{color:var(--t2)}
+.help-pop li b{color:var(--t1);font-size:12px}
+.menu{position:absolute;right:12px;top:46px;background:var(--s1);border:1px solid var(--line);
+  border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.12);padding:4px;display:none;z-index:50;min-width:150px}
+.menu.open{display:block}
+.menu button{display:block;width:100%;text-align:left;background:none;border:none;
+  padding:8px 12px;font-size:12px;cursor:pointer;color:var(--t1);border-radius:4px}
+.menu button:hover{background:var(--s2)}
+.menu button.dl{color:#c0392b}
+.menu hr{border:none;border-top:1px solid var(--line);margin:4px 0}
+
+.canvas-scroll{flex:1;overflow:auto;padding:16px;display:flex;justify-content:center;align-items:flex-start}
+#stage{position:relative;display:inline-block;line-height:0;box-shadow:0 2px 12px rgba(0,0,0,.12);background:#fff;max-width:100%}
+#baseImg{display:block;max-width:100%;height:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
+#layer{position:absolute;inset:0;touch-action:pan-x pan-y;cursor:crosshair}
+body.placing #layer{cursor:copy}
+
+.mask{position:absolute;background:rgba(255,255,255,.92);cursor:pointer}
+.mask:hover{box-shadow:inset 0 0 0 2px rgba(154,124,46,.45)}
+.mask.sel{outline:2px solid var(--acc);cursor:move;z-index:10}
+.mh{position:absolute;width:13px;height:13px;background:#fff;border:2px solid var(--acc);
+  border-radius:2px;z-index:11;touch-action:none}
+/* 점 자체는 작게 두고 클릭 판정만 넓힌다 — 살짝 빗나가도 옆 박스가 잡히지 않도록 */
+.mh::after{content:'';position:absolute;inset:-8px}
+.mh.nw{left:-7px;top:-7px;cursor:nwse-resize}   .mh.ne{right:-7px;top:-7px;cursor:nesw-resize}
+.mh.sw{left:-7px;bottom:-7px;cursor:nesw-resize}.mh.se{right:-7px;bottom:-7px;cursor:nwse-resize}
+.mh.w{left:-7px;top:50%;margin-top:-6.5px;cursor:ew-resize}
+.mh.e{right:-7px;top:50%;margin-top:-6.5px;cursor:ew-resize}
+.mh.n{top:-7px;left:50%;margin-left:-6.5px;cursor:ns-resize}
+.mh.s{bottom:-7px;left:50%;margin-left:-6.5px;cursor:ns-resize}
+.mark{position:absolute;background:#e02020;color:#fff;font-weight:800;
+  padding:.08em .3em;border-radius:.16em;font-family:system-ui,sans-serif;
+  letter-spacing:-.02em;cursor:move;touch-action:none;white-space:nowrap;
+  transform:translate(-50%,-50%);line-height:1.15;box-shadow:0 1px 3px rgba(0,0,0,.25);
+  user-select:none}
+.mark.sel{outline:3px solid var(--acc);outline-offset:2px}
+#rubber{position:absolute;background:rgba(255,255,255,.6);border:2px dashed var(--acc);display:none;pointer-events:none}
+#ppv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;overflow:visible}
+#ppv.on{display:block}
+#ppv polyline,#ppv polygon{fill:rgba(255,255,255,.55);stroke:#9a7c2e;stroke-width:1.6;
+  vector-effect:non-scaling-stroke;stroke-dasharray:5 4;stroke-linejoin:round}
+/* 점은 SVG가 아니라 HTML — 이미지 비율·크기와 무관하게 항상 같은 크기 */
+#ppvDots{position:absolute;inset:0;pointer-events:none;display:none}
+#ppvDots.on{display:block}
+#ppvDots i{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;
+  background:#fff;border:2px solid var(--acc);box-sizing:border-box}
+#ppvDots i.first{background:var(--acc);width:11px;height:11px;margin:-5.5px 0 0 -5.5px}
+.mask.poly{background:none}
+.mask.poly .fill{position:absolute;inset:0;background:rgba(255,255,255,.92)}
+.mask.poly.sel{outline:2px dashed var(--acc);outline-offset:1px}
+.vh{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;background:#fff;
+  border:2px solid var(--acc);border-radius:50%;z-index:12;touch-action:none;cursor:grab}
+.vh::after{content:'';position:absolute;inset:-7px}
+
+.statusbar{background:var(--s1);border-top:1px solid var(--line);padding:6px 14px;font-size:11.5px;color:var(--t2);flex-shrink:0}
+.empty{padding:50px 20px;text-align:center;color:var(--t3);line-height:2}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:44px 30px;text-align:center;color:var(--t2);background:var(--s1)}
+.drop.over{border-color:var(--acc);background:var(--s2)}
+@media(max-width:760px){
+  .topbar{padding:7px 8px;gap:6px}
+  .topbar h1{display:none}
+  .canvas-scroll{padding:6px}
+  .menu{right:6px;top:44px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1><span>소분</span>을 하자</h1>
+  <a class="btn" href="./" style="text-decoration:none" title="도구 모음">☰</a>
+  <a class="btn" href="drop.html" style="text-decoration:none" title="FGO 테이블 메이커로 이동">FGO →</a>
+  <div class="sep"></div>
+  <select class="sel-i" id="projSel" onchange="openProject(this.value)"></select>
+  <button class="btn" onclick="newProject()">+ 새 소분</button>
+  <div class="sep"></div>
+  <button class="btn" id="btnPoly" onclick="togglePoly()" title="클릭으로 점을 찍어 자유 모양으로 가리기">다각형</button>
+  <div class="sep"></div>
+  <button class="btn" id="btnMark" onclick="startPlace()">+ 숫자</button>
+  <button class="btn" onclick="scaleMarks(1.18)" title="숫자 전체 크게">크기+</button>
+  <button class="btn" onclick="scaleMarks(1/1.18)" title="숫자 전체 작게">크기−</button>
+  <div class="sep"></div>
+  <button class="btn" onclick="undo()">되돌리기</button>
+  <span class="help-wrap">
+    <button class="btn help" onclick="toggleHelp(event)" aria-label="사용법">?</button>
+    <div class="help-pop" id="helpPop">
+      <b>숫자 표식</b>
+      <ul>
+        <li><b>+숫자</b> 버튼 또는 <b>빈 곳 더블클릭</b> → 숫자 입력</li>
+        <li>숫자 <b>드래그</b> → 이동</li>
+        <li>숫자 <b>클릭 후 Delete</b> → 삭제</li>
+        <li><b>크기+ / 크기−</b> → 숫자 전체 크기 조절</li>
+      </ul>
+      <b>화이트 처리</b>
+      <ul>
+        <li>빈 곳 <b>드래그</b> → 사각형 화이트</li>
+        <li><b>다각형</b> 버튼 → 클릭으로 점 찍기 → 첫 점 클릭 / 더블클릭 / <b>Enter</b> → 닫기</li>
+        <li>화이트 <b>클릭</b> → 선택 (이동·크기 조절, 다각형은 꼭짓점 조절)</li>
+        <li><b>한 번 더 클릭</b> 또는 <b>더블클릭</b> → 사라짐</li>
+      </ul>
+      <b>공통</b>
+      <ul>
+        <li><b>Ctrl+Z</b> → 되돌리기</li>
+        <li><b>Esc</b> → 선택 해제</li>
+      </ul>
+      <b>저장</b>
+      <ul>
+        <li>데이터는 <b>이 브라우저에만</b> 저장 (서버 전송 없음)</li>
+        <li>다른 기기·브라우저에서는 안 보임</li>
+        <li>브라우저 <b>사이트 데이터 삭제</b> 시 같이 사라짐</li>
+        <li><b>⋯ → 백업 저장</b> → 파일로 보관</li>
+        <li><b>⋯ → 이 소분 삭제 / 전체 데이터 삭제</b></li>
+      </ul>
+    </div>
+  </span>
+  <span style="margin-left:auto"></span>
+  <button class="btn acc" onclick="exportPNG()">PNG 저장</button>
+  <button class="btn" onclick="toggleMenu(event)">⋯</button>
+  <div class="menu" id="menu">
+    <button onclick="closeMenu();document.getElementById('imgIn').click()">이미지 교체</button>
+    <button onclick="closeMenu();renameProject()">이름 바꾸기</button>
+    <hr/>
+    <button onclick="closeMenu();exportJSON()">백업 저장</button>
+    <button onclick="closeMenu();document.getElementById('jsonIn').click()">백업 불러오기</button>
+    <hr/>
+    <button class="dl" onclick="closeMenu();deleteProject()">이 소분 삭제</button>
+    <button class="dl" onclick="closeMenu();wipeAll()">전체 데이터 삭제</button>
+  </div>
+</div>
+
+<div class="canvas-scroll" id="scroll">
+  <div>
+    <div class="empty" id="emptyBox">
+      <div class="drop" id="drop">
+        이미지를 끌어다 놓거나 붙여넣기(Ctrl+V)<br/>
+        <button class="btn acc" style="margin-top:14px" onclick="document.getElementById('imgIn').click()">이미지 선택</button>
+      </div>
+    </div>
+    <div id="stage" style="display:none">
+      <img id="baseImg" alt=""/>
+      <div id="layer"></div>
+      <div id="rubber"></div>
+      <svg id="ppv" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+      <div id="ppvDots"></div>
+    </div>
+  </div>
+</div>
+<div class="statusbar" id="sb">준비</div>
+
+<input type="file" id="imgIn" accept="image/*" style="display:none"/>
+<input type="file" id="jsonIn" accept="application/json,.json" style="display:none"/>
+
+<script>
+/* ══════════ 상태 ══════════
+   masks : [{x,y,w,h}]  0~1 정규화 · 하얗게 가린 영역
+   marks : [{x,y,n,fs}] 0~1 정규화 중심 좌표 · +n 표식 (fs = 이미지 너비 대비 글자 크기)
+*/
+const LS_IDX = 'fgogoods.index';
+const LS_P = id => 'fgogoods.p.' + id;
+const DEF_SIZE = { w: 0.09, h: 0.16 };
+const DEF_FS = 0.026;
+const MAX_SIDE = 6000;   // 이 값 이하면 원본 해상도·원본 파일 그대로 보관 (화질 손실 없음)
+const CLICK_PX = 6;
+
+let P = null, img = null;
+let undoStack = [];
+let placing = false;
+let selMark = null;   // 선택된 숫자 표식 index
+let selMask = null;   // 선택된 흰 박스 index
+let polyMode = false; // 다각형 그리기 모드
+let polyPts = [];     // 그리는 중인 꼭짓점 [[x,y],...]
+
+/* 마스크 유틸 — 사각형 {x,y,w,h} / 다각형 {p:[[x,y],...]} 둘 다 취급 */
+const isPoly = m => Array.isArray(m.p);
+function bbox(m) {
+  if (!isPoly(m)) return { x: m.x, y: m.y, w: m.w, h: m.h };
+  const xs = m.p.map(q => q[0]), ys = m.p.map(q => q[1]);
+  const x = Math.min(...xs), y = Math.min(...ys);
+  return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
+}
+
+const $ = id => document.getElementById(id);
+const setSb = t => $('sb').textContent = t;
+const clamp01 = v => Math.max(0, Math.min(1, v));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ══════════ IndexedDB ══════════ */
+function idb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('fgogoods', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('images');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function idbPut(k, b) { const db = await idb(); return new Promise((res, rej) => {
+  const t = db.transaction('images', 'readwrite'); t.objectStore('images').put(b, k);
+  t.oncomplete = res; t.onerror = () => rej(t.error); }); }
+async function idbGet(k) { const db = await idb(); return new Promise((res, rej) => {
+  const t = db.transaction('images', 'readonly'); const q = t.objectStore('images').get(k);
+  q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
+async function idbDel(k) { const db = await idb(); return new Promise(res => {
+  const t = db.transaction('images', 'readwrite'); t.objectStore('images').delete(k); t.oncomplete = res; }); }
+
+/* ══════════ 프로젝트 ══════════ */
+const loadIndex = () => { try { return JSON.parse(localStorage.getItem(LS_IDX)) || []; } catch { return []; } };
+const saveIndex = ix => localStorage.setItem(LS_IDX, JSON.stringify(ix));
+
+function renderProjSel() {
+  const ix = loadIndex();
+  $('projSel').innerHTML = ix.length
+    ? ix.map(p => `<option value="${p.id}"${P && p.id === P.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('')
+    : '<option value="">(소분 없음)</option>';
+}
+function blankProject(id, name) {
+  return { version: 2, id, name, imgW: 0, imgH: 0, masks: [], marks: [], lastSize: { ...DEF_SIZE }, fs: DEF_FS };
+}
+/* 구버전(hotspots) → 새 구조 이관 */
+function migrate(p) {
+  if (!p) return p;
+  if (p.version === 2 && p.masks) {
+    if (!p.fs) p.fs = (p.marks && p.marks[0] && p.marks[0].fs) || DEF_FS;
+    return p;
+  }
+  const hs = p.hotspots || [];
+  const masks = [], marks = [];
+  for (const h of hs) {
+    const done = h.done !== undefined ? h.done : (h.qty !== undefined ? h.qty <= 0 : false);
+    const n = h.n || 0;
+    if (done) masks.push({ x: h.x, y: h.y, w: h.w, h: h.h });
+    else if (n > 0) marks.push({ x: clamp01(h.x + h.w), y: clamp01(h.y), n });
+  }
+  const sizes = hs.filter(h => h.w && h.h);
+  const med = a => { const s = a.slice().sort((x, y) => x - y); return s[s.length >> 1]; };
+  const lastSize = sizes.length ? { w: med(sizes.map(h => h.w)), h: med(sizes.map(h => h.h)) } : { ...DEF_SIZE };
+  const fs = (p.marks && p.marks[0] && p.marks[0].fs) || p.fs || DEF_FS;
+  return { version: 2, id: p.id, name: p.name, imgW: p.imgW || 0, imgH: p.imgH || 0, masks, marks, lastSize, fs };
+}
+function newProject() {
+  const name = prompt('소분 이름', '소분 ' + new Date().toISOString().slice(5, 10));
+  if (name === null) return;
+  const id = 'g' + Date.now().toString(36);
+  P = blankProject(id, name || '이름없음');
+  const ix = loadIndex(); ix.unshift({ id, name: P.name, updatedAt: Date.now() }); saveIndex(ix);
+  img = null; undoStack = [];
+  save(); renderProjSel(); renderAll();
+  setSb('이미지를 올리세요');
+}
+function renameProject() {
+  if (!P) return;
+  const n = prompt('소분 이름', P.name); if (n === null) return;
+  P.name = n || P.name;
+  const ix = loadIndex(); const e = ix.find(x => x.id === P.id); if (e) e.name = P.name;
+  saveIndex(ix); save(); renderProjSel();
+}
+async function deleteProject() {
+  if (!P) return;
+  if (!confirm(`"${P.name}" 삭제할까요?`)) return;
+  localStorage.removeItem(LS_P(P.id)); await idbDel(P.id);
+  saveIndex(loadIndex().filter(x => x.id !== P.id));
+  P = null; img = null;
+  const ix = loadIndex(); renderProjSel();
+  if (ix.length) openProject(ix[0].id); else { renderAll(); setSb('소분 없음'); }
+}
+/* 이 브라우저에 저장된 소분 데이터 전부 삭제 */
+async function wipeAll() {
+  const ix = loadIndex();
+  if (!confirm(`이 브라우저에 저장된 소분 ${ix.length}개와 이미지를 모두 삭제합니다.\n되돌릴 수 없습니다. 계속할까요?`)) return;
+  if (!confirm('정말 전부 삭제할까요? 필요하면 먼저 [백업 저장]을 하세요.')) return;
+  Object.keys(localStorage).filter(k => k.startsWith('fgogoods')).forEach(k => localStorage.removeItem(k));
+  try {
+    await new Promise(res => {
+      const r = indexedDB.deleteDatabase('fgogoods');
+      r.onsuccess = r.onerror = r.onblocked = res;
+    });
+  } catch {}
+  P = null; img = null; undoStack = []; selMask = selMark = null;
+  renderProjSel(); renderAll();
+  setSb('전체 삭제 완료 · [+ 새 소분]으로 다시 시작하세요');
+  setTimeout(() => location.reload(), 400);
+}
+
+async function openProject(id) {
+  if (!id) return;
+  let d; try { d = JSON.parse(localStorage.getItem(LS_P(id))); } catch { d = null; }
+  if (!d) { setSb('불러오기 실패'); return; }
+  P = migrate(d); undoStack = [];
+  const blob = await idbGet(id);
+  if (blob) await setImageFromBlob(blob, false); else img = null;
+  save(); renderProjSel(); renderAll();
+  setSb(`"${P.name}" · 가림 ${P.masks.length} · 숫자 ${P.marks.length}`);
+}
+let saveTimer = null;
+function save() {
+  if (!P) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(LS_P(P.id), JSON.stringify(P));
+    const ix = loadIndex(); const e = ix.find(x => x.id === P.id);
+    if (e) { e.updatedAt = Date.now(); e.name = P.name; saveIndex(ix); }
+  }, 350);
+}
+
+/* ══════════ 이미지 ══════════ */
+async function setImageFromBlob(blob, persist = true) {
+  await new Promise((res, rej) => {
+    const im = new Image();
+    im.onload = () => { img = im; res(); }; im.onerror = rej;
+    im.src = URL.createObjectURL(blob);
+  });
+  $('baseImg').src = img.src;
+  P.imgW = img.naturalWidth; P.imgH = img.naturalHeight;
+  if (persist) { await idbPut(P.id, blob); save(); }
+}
+async function handleFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  if (!P) { newProject(); if (!P) return; }
+  setSb('이미지 처리 중…');
+  const blob = await downscale(file, MAX_SIDE);   // 한도 이하면 원본 그대로(재인코딩 없음)
+  await setImageFromBlob(blob);
+  renderAll();
+  const shrunk = Math.max(P.imgW, P.imgH) >= MAX_SIDE;
+  setSb(`${P.imgW}×${P.imgH}${shrunk ? ' (너무 커서 축소됨)' : ' 원본 해상도'} · 드래그 = 화이트 처리 · 빈 곳 더블클릭 = 숫자`);
+}
+function downscale(file, maxSide) {
+  return new Promise(res => {
+    const im = new Image();
+    im.onload = () => {
+      const s = Math.min(1, maxSide / Math.max(im.naturalWidth, im.naturalHeight));
+      if (s >= 1) { res(file); return; }
+      const c = document.createElement('canvas');
+      c.width = Math.round(im.naturalWidth * s); c.height = Math.round(im.naturalHeight * s);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      c.toBlob(b => res(b || file), 'image/png');
+    };
+    im.onerror = () => res(file);
+    im.src = URL.createObjectURL(file);
+  });
+}
+
+/* ══════════ 되돌리기 ══════════ */
+function snap() {
+  if (!P) return;
+  undoStack.push(JSON.stringify({ masks: P.masks, marks: P.marks }));
+  if (undoStack.length > 50) undoStack.shift();
+}
+function undo() {
+  if (!undoStack.length) { setSb('되돌릴 게 없습니다'); return; }
+  const s = JSON.parse(undoStack.pop());
+  P.masks = s.masks; P.marks = s.marks;
+  selMask = selMark = null;
+  save(); renderAll(); setSb('되돌림');
+}
+
+/* ══════════ 렌더 ══════════ */
+function renderAll() {
+  const has = !!(P && img);
+  $('stage').style.display = has ? 'inline-block' : 'none';
+  $('emptyBox').style.display = has ? 'none' : 'block';
+  if (!has) { $('layer').innerHTML = ''; return; }
+  const wpx = $('baseImg').clientWidth || 1;
+  // 숫자(marks)를 먼저 → 흰 박스(masks)가 위층. 화이트로 덮으면 숫자도 가려진다
+  $('layer').innerHTML =
+    P.marks.map((m, i) =>
+      `<div class="mark${i === selMark ? ' sel' : ''}" data-t="m" data-i="${i}"
+        style="left:${m.x*100}%;top:${m.y*100}%;font-size:${Math.max(9,(P.fs||DEF_FS)*wpx)}px">+${m.n}</div>`).join('') +
+    P.masks.map((m, i) => {
+      const b = bbox(m), sel = i === selMask;
+      if (isPoly(m)) {
+        const cp = m.p.map(q => `${((q[0]-b.x)/(b.w||1e-6)*100).toFixed(3)}% ${((q[1]-b.y)/(b.h||1e-6)*100).toFixed(3)}%`).join(',');
+        return `<div class="mask poly${sel ? ' sel' : ''}" data-t="k" data-i="${i}"
+          style="left:${b.x*100}%;top:${b.y*100}%;width:${b.w*100}%;height:${b.h*100}%;
+                 clip-path:polygon(${cp});-webkit-clip-path:polygon(${cp})"><div class="fill"></div></div>`;
+      }
+      return `<div class="mask${sel ? ' sel' : ''}" data-t="k" data-i="${i}"
+        style="left:${b.x*100}%;top:${b.y*100}%;width:${b.w*100}%;height:${b.h*100}%">${
+        sel ? ['nw','n','ne','e','se','s','sw','w'].map(r => `<div class="mh ${r}" data-r="${r}"></div>`).join('') : ''
+      }</div>`;
+    }).join('') +
+    // 다각형 꼭짓점 핸들 (clip-path에 잘리지 않도록 마스크 바깥에 별도로)
+    ((selMask !== null && P.masks[selMask] && isPoly(P.masks[selMask]))
+      ? P.masks[selMask].p.map((q, vi) =>
+          `<div class="vh" data-t="v" data-v="${vi}" style="left:${q[0]*100}%;top:${q[1]*100}%"></div>`).join('')
+      : '');
+}
+window.addEventListener('resize', () => { if (P && img) renderAll(); });
+
+/* ══════════ 다각형 ══════════ */
+function togglePoly() {
+  if (!img) { setSb('이미지 먼저'); return; }
+  polyMode = !polyMode;
+  polyPts = [];
+  if (polyMode && placing) endPlace();
+  $('btnPoly').classList.toggle('on', polyMode);
+  drawPoly();
+  setSb(polyMode ? '클릭해서 점 찍기 · 첫 점 다시 클릭 또는 더블클릭/Enter = 닫기 · Esc = 취소'
+                 : '다각형 모드 해제');
+}
+function drawPoly() {
+  const el = $('ppv'), dt = $('ppvDots');
+  if (!polyMode || !polyPts.length) {
+    el.classList.remove('on'); el.innerHTML = '';
+    dt.classList.remove('on'); dt.innerHTML = '';
+    return;
+  }
+  const pts = polyPts.map(q => `${(q[0]*100).toFixed(3)},${(q[1]*100).toFixed(3)}`).join(' ');
+  el.innerHTML = polyPts.length > 2 ? `<polygon points="${pts}"/>` : `<polyline points="${pts}" fill="none"/>`;
+  el.classList.add('on');
+  dt.innerHTML = polyPts.map((q, i) =>
+    `<i class="${i === 0 ? 'first' : ''}" style="left:${q[0]*100}%;top:${q[1]*100}%"></i>`).join('');
+  dt.classList.add('on');
+}
+function finishPoly() {
+  if (polyPts.length < 3) { setSb('점을 3개 이상 찍어야 합니다'); return; }
+  snap();
+  P.masks.push({ p: polyPts.map(q => [clamp01(q[0]), clamp01(q[1])]) });
+  polyPts = []; polyMode = false;
+  $('btnPoly').classList.remove('on');
+  drawPoly(); save(); renderAll();
+  setSb('다각형 화이트 처리 · 클릭 = 선택(꼭짓점 조절) · 한 번 더 클릭 = 사라짐');
+}
+function cancelPoly() {
+  polyPts = []; polyMode = false;
+  $('btnPoly').classList.remove('on'); drawPoly(); setSb('취소');
+}
+
+/* ══════════ 숫자 표식 배치 ══════════ */
+function startPlace() {
+  if (!img) { setSb('이미지 먼저'); return; }
+  placing = !placing;
+  $('btnMark').classList.toggle('on', placing);
+  document.body.classList.toggle('placing', placing);
+  setSb(placing ? '숫자를 놓을 위치를 클릭하세요' : '취소');
+}
+function endPlace() {
+  placing = false; $('btnMark').classList.remove('on'); document.body.classList.remove('placing');
+}
+
+/* ══════════ 포인터 ══════════ */
+const layer = $('layer');
+let drag = null, lpTimer = null;
+
+const rectOf = () => $('baseImg').getBoundingClientRect();
+function toN(e) { const r = rectOf(); return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height }; }
+
+layer.addEventListener('pointerdown', e => {
+  if (!P || !img) return;
+  const el = e.target.closest('[data-t]');
+  const p = toN(e);
+
+  // 다각형 그리는 중 — 점 찍기 / 첫 점 근처면 닫기
+  if (polyMode) {
+    if (polyPts.length >= 3) {
+      const r = rectOf(), f = polyPts[0];
+      if (Math.hypot((p.x-f[0])*r.width, (p.y-f[1])*r.height) < 14) { finishPoly(); return; }
+    }
+    polyPts.push([clamp01(p.x), clamp01(p.y)]);
+    drawPoly(); setSb(`점 ${polyPts.length}개 · 첫 점 클릭/더블클릭/Enter로 닫기`);
+    return;
+  }
+
+  try { layer.setPointerCapture(e.pointerId); } catch {}
+
+  if (el && el.dataset.t === 'v') {          // 다각형 꼭짓점
+    const vi = +el.dataset.v;
+    drag = { type: 'vertex', i: selMask, v: vi, sx: e.clientX, sy: e.clientY,
+             o: [...P.masks[selMask].p[vi]], moved: false };
+    return;
+  }
+
+  if (el && el.dataset.t === 'm') {                 // 숫자 표식: 이동 or 값 수정
+    const i = +el.dataset.i;
+    drag = { type: 'mark', i, sx: e.clientX, sy: e.clientY, o: { ...P.marks[i] }, moved: false };
+    return;
+  }
+  if (el && el.dataset.t === 'k') {                 // 흰 박스: 선택 / 이동 / 크기조절
+    const i = +el.dataset.i;
+    if (selMark !== null) { selMark = null; }
+    const hd = e.target.closest('.mh');
+    if (hd && i === selMask) {
+      drag = { type: 'kresize', i, r: hd.dataset.r, sx: e.clientX, sy: e.clientY, o: { ...P.masks[i] }, moved: false };
+      return;
+    }
+    const already = (selMask === i);
+    if (!already) { selMask = i; renderAll(); }
+    const m = P.masks[i];
+    drag = { type: 'kmove', i, already, sx: e.clientX, sy: e.clientY, moved: false,
+             o: isPoly(m) ? { p: m.p.map(q => [...q]) } : { ...m } };
+    return;
+  }
+  if (placing) { drag = { type: 'place', px: p.x, py: p.y }; return; }
+
+  if (selMark !== null || selMask !== null) { selMark = null; selMask = null; renderAll(); }   // 빈 곳 = 선택 해제
+  // 빈 곳: 드래그해야만 새 박스 생성 (클릭만으로는 아무 일도 없음)
+  drag = { type: 'draw', sx: e.clientX, sy: e.clientY, nx: p.x, ny: p.y, cx: p.x, cy: p.y, moved: false, touch: e.pointerType === 'touch', armed: e.pointerType !== 'touch' };
+  if (drag.touch) lpTimer = setTimeout(() => { if (drag) { drag.armed = true; setSb('영역을 드래그하세요'); } }, 380);
+});
+
+layer.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const dx = e.clientX - (drag.sx || 0), dy = e.clientY - (drag.sy || 0);
+  const far = Math.hypot(dx, dy) > CLICK_PX;
+
+  if (drag.type === 'mark') {
+    if (!far) return;
+    if (!drag.moved) snap();
+    drag.moved = true;
+    const r = rectOf();
+    P.marks[drag.i].x = clamp01(drag.o.x + dx / r.width);
+    P.marks[drag.i].y = clamp01(drag.o.y + dy / r.height);
+    renderAll(); return;
+  }
+  if (drag.type === 'vertex') {
+    if (!far) return;
+    if (!drag.moved) snap();
+    drag.moved = true;
+    const r = rectOf();
+    P.masks[drag.i].p[drag.v] = [clamp01(drag.o[0] + dx / r.width), clamp01(drag.o[1] + dy / r.height)];
+    renderAll(); return;
+  }
+  if (drag.type === 'kmove' || drag.type === 'kresize') {
+    if (!far) return;
+    if (!drag.moved) snap();
+    drag.moved = true;
+    const r = rectOf(), nx = dx / r.width, ny = dy / r.height, m = P.masks[drag.i], o = drag.o;
+    if (isPoly(m)) {   // 다각형은 통째 이동만
+      m.p = o.p.map(q => [clamp01(q[0] + nx), clamp01(q[1] + ny)]);
+      renderAll(); return;
+    }
+    if (drag.type === 'kmove') { m.x = clamp01(o.x + nx); m.y = clamp01(o.y + ny); }
+    else {
+      let x = o.x, y = o.y, w = o.w, h = o.h;
+      if (drag.r.includes('w')) { x = o.x + nx; w = o.w - nx; }
+      if (drag.r.includes('e')) { w = o.w + nx; }
+      if (drag.r.includes('n')) { y = o.y + ny; h = o.h - ny; }
+      if (drag.r.includes('s')) { h = o.h + ny; }
+      if (w > 0.004) { m.x = clamp01(x); m.w = w; }
+      if (h > 0.004) { m.y = clamp01(y); m.h = h; }
+    }
+    renderAll(); return;
+  }
+  if (drag.type === 'draw') {
+    if (far) drag.moved = true;
+    if (!drag.armed) { if (far && lpTimer) { clearTimeout(lpTimer); lpTimer = null; drag = null; } return; }
+    const p = toN(e); drag.cx = p.x; drag.cy = p.y;
+    showRubber(drag.nx, drag.ny, p.x, p.y);
+  }
+});
+
+layer.addEventListener('pointerup', e => {
+  if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; }
+  if (!drag) return;
+  hideRubber();
+  const d = drag; drag = null;
+
+  if (d.type === 'mark') {
+    if (d.moved) { save(); setSb('숫자 이동'); }
+    else { selMark = d.i; renderAll(); setSb('선택됨 · Delete 삭제 · 더블클릭 값 변경'); }
+    return;
+  }
+  if (d.type === 'vertex') {
+    if (d.moved) { save(); setSb('꼭짓점 이동'); }
+    return;
+  }
+  if (d.type === 'kmove' || d.type === 'kresize') {
+    if (d.moved) { save(); setSb(d.type === 'kmove' ? '이동' : '크기 변경'); }
+    else if (d.already) deleteMask(d.i);            // 선택된 걸 한 번 더 클릭 = 사라짐
+    else setSb('선택됨 · 끌어서 이동 · 모서리로 크기 조절 · 한 번 더 클릭하면 사라짐');
+    return;
+  }
+  if (d.type === 'place') { addMark(d.px, d.py); return; }
+
+  if (d.type === 'draw') {
+    const x = Math.min(d.nx, d.cx), y = Math.min(d.ny, d.cy);
+    const w = Math.abs(d.cx - d.nx), h = Math.abs(d.cy - d.ny);
+    snap();
+    if (!(d.moved && w > 0.008 && h > 0.008)) { undoStack.pop(); return; }   // 그냥 클릭이면 아무것도 안 함
+    P.masks.push({ x, y, w, h });
+    P.lastSize = { w, h };
+    setSb('화이트 처리 · 클릭 = 선택(이동·크기조절) · 한 번 더 클릭 = 사라짐');
+    save(); renderAll();
+  }
+});
+layer.addEventListener('pointercancel', () => { hideRubber(); drag = null; if (lpTimer) clearTimeout(lpTimer); });
+
+function addMark(x, y) {
+  const v = prompt('숫자 (예: 2)', '2');
+  endPlace();
+  if (v === null) return;
+  const n = Math.max(0, Math.min(99, parseInt(v, 10) || 0));
+  if (!n) return;
+  snap(); P.marks.push({ x, y, n }); selMark = P.marks.length - 1;
+  save(); renderAll(); setSb(`+${n} 추가 · 끌어서 위치 조정`);
+}
+function editMark(i) {
+  const m = P.marks[i]; if (!m) return;
+  const v = prompt('숫자 (0 또는 빈칸이면 삭제)', m.n);
+  if (v === null) return;
+  const n = Math.max(0, Math.min(99, parseInt(v, 10) || 0));
+  snap();
+  if (!n) { P.marks.splice(i, 1); selMark = null; setSb('숫자 삭제'); }
+  else { m.n = n; setSb(`+${n}`); }
+  save(); renderAll();
+}
+function deleteMark(i) {
+  if (i === null || !P.marks[i]) return;
+  snap(); P.marks.splice(i, 1); selMark = null;
+  save(); renderAll(); setSb('숫자 삭제');
+}
+/* 숫자 전체 크기 조절 */
+function scaleMarks(f) {
+  if (!P) return;
+  P.fs = Math.max(0.008, Math.min(0.2, (P.fs || DEF_FS) * f));
+  save(); renderAll();
+  setSb('숫자 크기 ' + Math.round(P.fs * 1000) / 10 + '%');
+}
+
+function showRubber(x0, y0, x1, y1) {
+  const r = rectOf(), st = $('stage').getBoundingClientRect(), el = $('rubber');
+  const x = Math.min(x0, x1), y = Math.min(y0, y1), w = Math.abs(x1 - x0), h = Math.abs(y1 - y0);
+  el.style.display = 'block';
+  el.style.left = (r.left - st.left + x * r.width) + 'px';
+  el.style.top = (r.top - st.top + y * r.height) + 'px';
+  el.style.width = (w * r.width) + 'px';
+  el.style.height = (h * r.height) + 'px';
+}
+const hideRubber = () => $('rubber').style.display = 'none';
+
+/* ══════════ 키보드 / 메뉴 ══════════ */
+document.addEventListener('keydown', e => {
+  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
+  if (e.key === 'Enter' && polyMode) { e.preventDefault(); finishPoly(); return; }
+  if (e.key === 'Escape') {
+    if (polyMode) { cancelPoly(); return; }
+    if (placing) endPlace();
+    if (selMark !== null || selMask !== null) { selMark = selMask = null; renderAll(); }
+    return;
+  }
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (selMark !== null) { e.preventDefault(); deleteMark(selMark); }
+    else if (selMask !== null) { e.preventDefault(); deleteMask(selMask); }
+  }
+});
+/* 더블클릭: 숫자 = 값 변경 · 빈 공간 = 그 자리에 숫자 추가
+   (흰 박스는 두 번째 클릭에서 이미 삭제되므로 여기서 처리하지 않는다) */
+layer.addEventListener('dblclick', e => {
+  if (polyMode) { e.preventDefault(); finishPoly(); return; }
+  const m = e.target.closest('[data-t="m"]');
+  if (m) { e.preventDefault(); editMark(+m.dataset.i); return; }
+  if (e.target.closest('[data-t="k"]') || e.target.closest('[data-t="v"]')) return;
+  e.preventDefault();
+  const p = toN(e);
+  addMark(clamp01(p.x), clamp01(p.y));
+});
+function deleteMask(i) {
+  if (i === null || !P.masks[i]) return;
+  snap(); P.masks.splice(i, 1); selMask = null;
+  save(); renderAll(); setSb('되살림');
+}
+function toggleMenu(e) { e.stopPropagation(); $('helpPop').classList.remove('open'); $('menu').classList.toggle('open'); }
+const closeMenu = () => $('menu').classList.remove('open');
+function toggleHelp(e) { e.stopPropagation(); closeMenu(); $('helpPop').classList.toggle('open'); }
+document.addEventListener('click', e => {
+  if (!e.target.closest('.menu') && !e.target.closest('.topbar .btn')) closeMenu();
+  if (!e.target.closest('.help-wrap')) $('helpPop').classList.remove('open');
+});
+
+/* ══════════ 입력 ══════════ */
+$('imgIn').addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ''; });
+document.addEventListener('paste', e => {
+  const it = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+  if (it) handleFile(it.getAsFile());
+});
+['dragenter', 'dragover'].forEach(t => document.addEventListener(t, e => { e.preventDefault(); $('drop')?.classList.add('over'); }));
+['dragleave', 'drop'].forEach(t => document.addEventListener(t, e => { e.preventDefault(); $('drop')?.classList.remove('over'); }));
+document.addEventListener('drop', e => { const f = e.dataTransfer?.files?.[0]; if (f) handleFile(f); });
+
+/* ══════════ 내보내기 ══════════ */
+function exportPNG() {
+  if (!P || !img) { setSb('이미지 없음'); return; }
+  const c = document.createElement('canvas');
+  c.width = img.naturalWidth; c.height = img.naturalHeight;
+  const x = c.getContext('2d');
+  x.drawImage(img, 0, 0);
+  for (const m of P.marks) {
+    const fs = Math.max(10, (P.fs || DEF_FS) * c.width);
+    x.font = `800 ${fs}px system-ui,'Noto Sans KR',sans-serif`;
+    const t = '+' + m.n, tw = x.measureText(t).width, pad = fs * 0.3;
+    const bw = tw + pad * 2, bh = fs * 1.15 + pad * 0.5;
+    const bx = m.x * c.width - bw / 2, by = m.y * c.height - bh / 2;
+    x.fillStyle = '#e02020'; x.fillRect(bx, by, bw, bh);
+    x.fillStyle = '#fff'; x.textBaseline = 'middle'; x.textAlign = 'center';
+    x.fillText(t, bx + bw / 2, by + bh / 2 + fs * 0.03);
+  }
+  x.fillStyle = 'rgba(255,255,255,0.92)';
+  for (const m of P.masks) {
+    if (isPoly(m)) {
+      x.beginPath();
+      m.p.forEach((q, i) => i ? x.lineTo(q[0]*c.width, q[1]*c.height) : x.moveTo(q[0]*c.width, q[1]*c.height));
+      x.closePath(); x.fill();
+    } else {
+      x.fillRect(m.x * c.width, m.y * c.height, m.w * c.width, m.h * c.height);
+    }
+  }
+  const a = document.createElement('a');
+  a.download = (P.name || '소분').replace(/[^\w가-힣\s-]/g, '').trim().replace(/\s+/g, '_') + '_잔여.png';
+  a.href = c.toDataURL('image/png'); a.click();
+  setSb('PNG 저장 완료 ✓');
+}
+async function exportJSON() {
+  if (!P) return;
+  const blob = await idbGet(P.id);
+  const dataURL = blob ? await new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(blob); }) : null;
+  const a = document.createElement('a');
+  a.download = (P.name || '소분').replace(/\s+/g, '_') + '.json';
+  a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'fgogoods', version: 2, project: P, image: dataURL })], { type: 'application/json' }));
+  a.click(); setSb('백업 저장 완료');
+}
+$('jsonIn').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const o = JSON.parse(await f.text());
+    if (o.app !== 'fgogoods') throw new Error('형식이 다릅니다');
+    const id = 'g' + Date.now().toString(36);
+    P = migrate(Object.assign({}, o.project, { id }));
+    const ix = loadIndex(); ix.unshift({ id, name: P.name, updatedAt: Date.now() }); saveIndex(ix);
+    if (o.image) await setImageFromBlob(await (await fetch(o.image)).blob()); else img = null;
+    undoStack = []; save(); renderProjSel(); renderAll(); setSb('백업 불러오기 완료');
+  } catch (err) { setSb('불러오기 실패: ' + err.message); }
+});
+
+/* ══════════ 시작 ══════════ */
+(async function init() {
+  renderProjSel();
+  const ix = loadIndex();
+  if (ix.length) await openProject(ix[0].id);
+  else setSb('[+ 새 소분]으로 시작하세요');
+  if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
+})();
+</script>
+</body>
+</html>

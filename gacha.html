@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>2026 여름 축제 기념 복주머니</title>
+<meta name="description" content="페그오(KR) 보유서번트, 보구 체크 해서 이번 복주머니는 어디 돌릴지 생각해보자."/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="한그오 확챠 플래너"/>
+<meta property="og:title" content="2026 여름 축제 기념 복주머니"/>
+<meta property="og:description" content="페그오(KR) 보유서번트, 보구 체크 해서 이번 복주머니는 어디 돌릴지 생각해보자."/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f5f0; --s1:#ffffff; --s2:#f0ede8; --s3:#e8e4de; --line:#ddd9d2;
+  --t1:#1a1814; --t2:#6b6660; --t3:#aaa49e; --acc:#9a7c2e; --acc2:#7a5e1e;
+  --new:#2e8b57; --own:#8a8580; --skp:#c0392b;
+  --red:#c94f6d; --wht:#5b7fb0;
+  --skpop:.65;
+}
+body{
+  background:var(--bg);color:var(--t1);
+  font-family:'Segoe UI','Noto Sans KR',system-ui,sans-serif;
+  height:100vh;display:flex;flex-direction:column;overflow:hidden;
+  font-size:13px;line-height:1.5;
+}
+
+/* ── 상단바 ── */
+.topbar{background:var(--s1);border-bottom:1px solid var(--line);padding:8px 14px;
+  display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.topbar h1{font-size:14px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.topbar h1 span{color:var(--acc)}
+.spacer{margin-left:auto}
+
+.btn{background:var(--s2);color:var(--t1);border:1px solid var(--line);border-radius:5px;
+  padding:0 11px;height:29px;font-size:12px;font-family:inherit;
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  cursor:pointer;white-space:nowrap;transition:background .1s,border-color .1s,color .1s}
+.btn:hover{background:var(--s3);border-color:var(--t3)}
+.btn.acc{border-color:var(--acc);color:var(--acc)}
+.btn.acc:hover{background:var(--acc);color:#fff}
+.btn.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btn.on:hover{background:var(--acc2)}
+.btn.danger:hover{background:var(--skp);color:#fff;border-color:var(--skp)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.sel,.inp{background:var(--bg);color:var(--t1);border:1px solid var(--line);border-radius:5px;
+  height:29px;padding:0 8px;font-size:12px;font-family:inherit;outline:none;transition:border-color .12s}
+.sel:focus,.inp:focus{border-color:var(--acc)}
+.sel.wide{max-width:340px}
+.sep{width:1px;height:18px;background:var(--line);flex-shrink:0}
+a.navlink{text-decoration:none}
+
+/* ── 스텝 바 ── */
+.steps{background:var(--s1);border-bottom:1px solid var(--line);padding:0 14px;display:flex;gap:2px;flex-shrink:0}
+.step{padding:9px 16px;font-size:12px;cursor:pointer;color:var(--t2);
+  border:none;background:none;border-bottom:2px solid transparent;font-family:inherit;letter-spacing:.02em}
+.step:hover{color:var(--t1)}
+.step.active{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+.step .num{display:inline-block;width:16px;height:16px;line-height:16px;border-radius:50%;
+  background:var(--s3);color:var(--t2);font-size:10px;text-align:center;margin-right:5px}
+.step.active .num{background:var(--acc);color:#fff}
+
+/* ── 본문 ── */
+.view{flex:1;overflow-y:auto;padding:12px 14px 70px}
+.view::-webkit-scrollbar{width:9px}
+.view::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px}
+.hide{display:none!important}
+
+.bar{background:var(--s1);border:1px solid var(--line);border-radius:7px;
+  padding:8px 10px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.bar .lbl{font-size:11px;color:var(--t3);margin-right:2px;white-space:nowrap}
+.opbox{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0}
+.opbox input[type=range]{width:104px;accent-color:var(--acc);flex:0 1 104px;min-width:60px}
+#opVal{min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+
+.chip{background:var(--s2);border:1px solid var(--line);border-radius:20px;
+  padding:3px 10px;font-size:11px;cursor:pointer;color:var(--t2);transition:all .1s;user-select:none}
+.chip:hover{border-color:var(--t3);color:var(--t1)}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+
+/* ── STEP1 서번트 그리드 ── */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:6px}
+.sc{position:relative;background:var(--s1);border:1px solid var(--line);border-radius:6px;
+  padding:5px 3px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;user-select:none;transition:border-color .1s,background .1s}
+.sc:hover{border-color:var(--acc)}
+.sc img{width:56px;height:56px;object-fit:contain;border-radius:4px;transition:filter .12s,opacity .12s}
+.sc.owned{background:#eef5ee;border-color:#b9d4b9}
+.sc.owned img{filter:grayscale(.55) brightness(.94)}
+.np{position:absolute;top:3px;right:3px;background:var(--new);color:#fff;
+  font-size:9px;font-weight:700;border-radius:4px;padding:1px 4px;letter-spacing:.02em}
+.np.max{background:var(--acc)}
+/* 지금 서버에 아직 안 나온 서번트 — 흐리게. 지워버리면 있는 줄도 모른다 */
+.sgrid .sc.off img{opacity:.30;filter:grayscale(.7)}
+.sgrid .sc.off .np{opacity:.45}
+/* 한국/일본 서버 고르기 */
+.srvsel{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;
+  margin-right:8px;vertical-align:-2px}
+.srvsel .srv{padding:2px 8px;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;background:var(--s1)}
+.srvsel .srv.on{background:var(--acc);color:#fff}
+
+/* STEP1 그리드 = 이미지만. 카드 여백·테두리 없이 아이콘이 칸을 꽉 채운다 */
+.sgrid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:5px}
+.sgrid .sc{padding:0;gap:0;border:0;background:none;border-radius:6px;overflow:hidden}
+.sgrid .sc img{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;
+  border-radius:6px;display:block}
+.sgrid .sc:hover{background:none;box-shadow:0 0 0 2px var(--acc)}
+.sgrid .sc .nm,.sgrid .sc .no{display:none}
+/* 보구레벨 = 이미지 위에 연한 붉은 막을 덮고 큰 숫자를 가운데 */
+.sgrid .sc.owned{background:none;box-shadow:0 0 0 2px #cf6a72}
+.sgrid .sc.owned img{filter:none}
+.sgrid .np{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(206,38,48,.52);border-radius:6px;padding:0;letter-spacing:0;
+  font-size:52px;font-weight:800;line-height:1;color:#fff;
+  text-shadow:0 0 4px rgba(130,15,25,.98),0 0 12px rgba(90,10,15,.75),0 2px 5px rgba(0,0,0,.55)}
+.sgrid .np.max{background:rgba(168,128,30,.55);
+  text-shadow:0 0 4px rgba(95,72,20,.98),0 0 12px rgba(70,52,12,.75),0 2px 5px rgba(0,0,0,.55)}
+
+/* ── 고정 하단바 ── */
+.foot{position:fixed;left:0;right:0;bottom:0;background:var(--s1);border-top:1px solid var(--line);
+  padding:8px 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;z-index:30}
+.foot .stat{font-size:12px;color:var(--t2)}
+.foot .stat b{color:var(--acc);font-weight:700}
+
+/* ── STEP2 복주머니 ── */
+.summary{background:var(--s1);border:1px solid var(--line);border-radius:7px;padding:10px 12px;margin-bottom:10px;font-size:12px}
+.summary .hl{color:var(--acc);font-weight:700}
+
+#bagWrap,#pickWrap{display:grid;gap:9px}
+.bag{background:var(--s1);border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  display:flex;flex-direction:column;transition:box-shadow .12s,border-color .12s}
+.bag-hd{display:flex;align-items:center;gap:8px;padding:6px 10px;
+  background:var(--s2);border-bottom:1px solid var(--line)}
+.grp{font-size:14px;font-weight:800;border-radius:5px;padding:3px 9px;color:#fff;flex-shrink:0;
+  line-height:1;display:inline-flex;align-items:center;letter-spacing:.03em}
+.grp.R{background:var(--red)}
+.grp.W{background:var(--wht)}
+.grp.N{background:var(--t3)}
+.bag-nm{font-size:17px;font-weight:700;flex:1;min-width:0;outline:none;line-height:1.2;
+  display:flex;align-items:center;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bag-body{display:flex;flex-wrap:wrap;gap:4px;padding:7px 8px}
+/* 고민 중인 백 — 카드 아무 데나 눌러 켠다 (서번트 칸 제외) */
+#bagWrap .bag{cursor:pointer}
+#bagWrap .bag .fc{cursor:default}
+.bag.pick{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+.bag.pick .bag-hd{background:var(--acc);}
+.bag.pick .bag-nm{color:#fff}
+/* 담긴 표시는 색으로만 — 체크박스는 두지 않는다 */
+/* 참고 탭은 흐름(1→2→3)에 안 섞이게 번호 없이 회색 */
+.step.ref{color:var(--t3)}
+.step.ref.active{color:var(--acc)}
+#kanNav{flex-wrap:wrap;gap:6px}
+.kbtn{padding:4px 11px;font-size:13px;font-weight:700;border:1px solid var(--line);
+  border-radius:6px;background:var(--s1);color:var(--t2);cursor:pointer}
+.kbtn:hover{border-color:var(--acc);color:var(--acc)}
+.ksec{margin:0 0 16px;scroll-margin-top:64px}
+/* 제목을 격자 안에 넣고 열 전체를 잇게 한다 — 카드가 쓰는 폭에만 맞춰진다 */
+.kgrid>h3{grid-column:1/-1;font-size:15px;font-weight:800;margin:0;padding:5px 10px;
+  background:var(--s2);border:1px solid var(--line);border-radius:7px}
+/* 한 가챠 = 박스 하나. 한 줄에 여러 개 깔아 스크롤을 줄인다 (확챠표와 같은 방식) */
+/* 화면 폭을 채우게 늘린다. 서번트가 적은 백은 카드 안 오른쪽이 비지만 그게 낫다.
+   칸 폭을 고정하면 넓은 화면에서 오른쪽이 통째로 남는다 */
+/* auto-fit 은 남는 칸이 있으면 채워진 칸을 늘려버려 좁게 잡은 폭이 무시된다 → auto-fill */
+.kgrid{display:grid;gap:7px;grid-template-columns:repeat(auto-fill,minmax(var(--kw,272px),1fr))}
+/* 한 줄로 고정 — 줄바꿈되면 카드 높이가 들쭉날쭉해진다 */
+.kcard{display:flex;align-items:flex-end;gap:5px;flex-wrap:nowrap;
+  background:var(--s1);border:1px solid var(--line);border-radius:8px;padding:6px 7px}
+.kmain,.kalt{display:flex;align-items:flex-end;gap:5px;flex-wrap:nowrap}
+.kalt{gap:7px}
+.kgrp{display:flex;flex-direction:column;align-items:center;gap:2px}
+.kgrp>.row{display:flex;gap:4px}
+.kgrp>.cap{font-size:10px;color:var(--t3);font-weight:700;line-height:1}
+.kgrp.re>.cap{color:var(--acc)}
+.kgrp.re.al>.cap{color:var(--wht)}
+.kgrp.re{padding-left:6px;border-left:1px dashed var(--line)}
+.kgrp>.cap{order:-1}
+.fc.kf{width:66px;height:66px;flex:0 0 66px;border-radius:7px}
+.fc.kf.sm{width:52px;height:52px;flex:0 0 52px}
+.fc.kf .np{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(196,60,66,.42);color:#fff;font-size:26px;font-weight:900;
+  border-radius:7px;padding:0;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.fc.kf.sm .np{font-size:19px}
+.fc.kf.own{box-shadow:0 0 0 2px #cf6a72}
+/* 폰은 2열. 한 줄에 다 못 넣으니 카드 안에서 두 줄로 접고 높이를 맞춘다 */
+@media(max-width:640px){
+  .kgrid{grid-template-columns:1fr 1fr;gap:5px}
+  .kcard{flex-wrap:wrap;padding:5px;gap:4px;min-height:104px;justify-content:flex-start}
+  .kmain,.kalt{flex-wrap:wrap;gap:4px}
+  .kalt{gap:6px}
+  .fc.kf{width:44px;height:44px;flex:0 0 44px;border-radius:6px}
+  .fc.kf.sm{width:34px;height:34px;flex:0 0 34px}
+  .fc.kf .np{font-size:18px;border-radius:6px} .fc.kf.sm .np{font-size:13px}
+  .kgrp>.cap{font-size:9px}
+  .kgrp.re{padding-left:4px}
+}
+
+.fc{position:relative;width:86px;height:86px;flex:0 0 86px;user-select:none;cursor:default;
+  border-radius:6px;overflow:hidden}
+.fc img{width:100%;height:100%;object-fit:cover;display:block;border-radius:6px}
+/* 보유 = 붉은 막 + 보구레벨 숫자 / 제외 = 검정 막 */
+.fc .ov{position:absolute;inset:0;display:none;border-radius:6px;
+  align-items:center;justify-content:center;pointer-events:none;
+  font-size:40px;font-weight:800;line-height:1;color:#fff}
+.fc.st-own .ov{display:flex;background:rgba(206,38,48,.52);
+  text-shadow:0 0 4px rgba(130,15,25,.98),0 0 12px rgba(90,10,15,.75),0 2px 5px rgba(0,0,0,.55)}
+.fc.st-own.np5 .ov{background:rgba(168,128,30,.55);
+  text-shadow:0 0 4px rgba(95,72,20,.98),0 0 12px rgba(70,52,12,.75),0 2px 5px rgba(0,0,0,.55)}
+.fc.st-skip .ov{display:flex;background:#123a63;opacity:var(--skpop)}
+body.skipmode .fc{cursor:pointer}
+body.skipmode .fc:hover{box-shadow:inset 0 0 0 3px var(--skp)}
+
+/* ── 좁은 화면(폰) ── 1열은 너무 휑해서 2열로 두고 아이콘을 줄인다 ── */
+@media (max-width:760px){
+  .pngbox .fc{width:86px;height:86px;flex:0 0 86px}
+  .pngbox .fc .ov{font-size:40px}
+  .pngbox .bag-nm{font-size:17px}
+  .pngbox .grp{font-size:14px;padding:3px 9px}
+  .pngbox .bag-body{gap:4px;padding:7px 8px}
+  .pngbox .bag-hd{padding:6px 10px;gap:8px}
+  /* 버튼이 줄바꿈으로 뒤엉키지 않게 줄을 나눠 배치한다 */
+  .topbar{padding:7px 9px;gap:6px;row-gap:7px}
+  .topbar h1{width:100%;font-size:13px}
+  .topbar .sel.wide{flex:1 1 100%;max-width:none;order:1}
+  .topbar .btn{order:2;flex:1 1 0;min-width:0}
+  .topbar .navlink,.topbar .spacer,.topbar .sep{display:none}
+  .steps{padding:0 9px}
+  .step{padding:9px 12px}
+  .bar{padding:7px 8px;gap:6px;row-gap:7px}
+  .bar .lbl{font-size:10px}
+  .bar .sep,.bar .spacer{display:none}
+  .bar .btn{flex:1 1 auto}
+  .bar .sel{flex:0 0 auto}
+  .opbox{flex:1 1 100%;order:5}
+  .opbox input[type=range]{flex:1 1 auto}
+  .foot{padding:7px 9px;gap:7px}
+  .foot .stat{width:100%;font-size:11px}
+  .foot .btn{flex:1 1 0}
+
+  #bagWrap,#pickWrap{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .fc{width:54px;height:54px;flex:0 0 54px}
+  .fc .ov{font-size:26px}
+  .bag-hd{padding:5px 7px;gap:5px}
+  .grp{font-size:11px;padding:2px 6px}
+  .bag-nm{font-size:13px}
+  .bag-body{gap:3px;padding:5px 6px}
+  .view{padding:10px 8px 70px}
+  .sgrid{grid-template-columns:repeat(auto-fill,minmax(78px,1fr))}
+  .sgrid .np{font-size:36px}
+}
+@media (max-width:430px){
+  .pngbox .fc{width:86px;height:86px;flex:0 0 86px}
+  .pngbox .fc .ov{font-size:40px}
+  .pngbox .bag-nm{font-size:17px}
+  .fc{width:46px;height:46px;flex:0 0 46px}
+  .fc .ov{font-size:22px}
+  .bag-nm{font-size:12px}
+}
+
+/* ── 빈 상태 ── */
+.empty{text-align:center;padding:48px 20px;color:var(--t3);font-size:12.5px;line-height:1.9}
+.empty b{color:var(--t1);display:block;font-size:14px;margin-bottom:8px;font-weight:600}
+
+/* ── 모달 ── */
+.mbg{position:fixed;inset:0;background:rgba(20,18,14,.45);display:none;
+  align-items:center;justify-content:center;z-index:100}
+.mbg.open{display:flex}
+.mbox{background:var(--s1);border-radius:10px;width:min(760px,92vw);max-height:82vh;
+  display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.28)}
+
+.toast{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);
+  background:var(--t1);color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;
+  opacity:0;pointer-events:none;transition:opacity .2s;z-index:200}
+.toast.show{opacity:.94}
+.spin{display:inline-block;width:11px;height:11px;border:2px solid var(--line);
+  border-top-color:var(--acc);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-1px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>2026 여름 축제 기념 <span>복주머니</span></h1>
+  <select class="sel wide" id="evtSel" onchange="changeEvent()">
+    <option value="">확챠 불러오는 중…</option>
+  </select>
+  <div class="sep"></div>
+  <button class="btn acc" onclick="document.getElementById('fileIn').click()"
+          title="영기일람 스크린샷을 올리면 보유 서번트와 보구레벨을 자동으로 읽습니다">캡쳐 업로드</button>
+  <input type="file" id="fileIn" accept="image/*" multiple style="display:none" onchange="loadFile(this)"/>
+  <div class="spacer"></div>
+  <a class="btn navlink" href="./" title="도구 모음">☰</a>
+  <a class="btn navlink" href="drop.html">테이블 메이커 →</a>
+  <a class="btn navlink" href="goods.html">소분 →</a>
+  <div class="sep"></div>
+  <button class="btn acc" id="btnPng" onclick="exportPNG()" title="지금 화면을 이미지로 저장">PNG 저장</button>
+</div>
+
+<div class="steps">
+  <button class="step active" id="stp1" onclick="goStep(1)"><span class="num">1</span>보유 서번트</button>
+  <button class="step" id="stp2" onclick="goStep(2)"><span class="num">2</span>확챠 표</button>
+  <button class="step" id="stp3" onclick="goStep(3)"><span class="num">3</span>어디를 돌릴까</button>
+  <button class="step ref" id="stp4" onclick="goStep(4)">(참고) JP 관위전</button>
+</div>
+
+<!-- ══ STEP 1 ══ -->
+<div class="view" id="v1">
+  <div class="bar">
+    <input class="inp" id="q1" placeholder="이름 검색…" oninput="renderSvt()" style="width:150px"/>
+    <div class="sep"></div>
+    <span class="lbl">클래스</span>
+    <span id="clsChips" style="display:flex;gap:4px;flex-wrap:wrap"></span>
+  </div>
+  <div style="font-size:11px;color:var(--t3);margin:0 2px 8px" id="hint1">
+    클릭 = 미보유 → 보구1 → 2 → 3 → 4 → 5 → 미보유 (한 바퀴). 되돌리려면 우클릭.
+    도감번호(마테리얼) 순으로 정렬돼 있습니다.
+  </div>
+  <div class="sgrid" id="sgrid"><div style="padding:20px;color:var(--t3)"><span class="spin"></span> 서번트 목록 로딩 중…</div></div>
+</div>
+
+<!-- ══ STEP 2 ══ -->
+<div class="view hide" id="v2">
+  <div class="bar">
+    <span class="lbl">열</span>
+    <select class="sel" id="colSel" onchange="applyCols()">
+      <option value="0" selected>자동 (화면 폭에 맞춤)</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+    </select>
+    <div class="sep"></div>
+    <span class="opbox">
+      <span class="lbl">제외 농도</span>
+      <input type="range" id="opRange" min="0" max="100" step="5" value="65"
+             oninput="setOp(this.value)"/>
+      <span class="lbl" id="opVal">65%</span>
+    </span>
+    <div class="sep"></div>
+    <button class="btn" id="btnSkip" onclick="tglSkipMode()">뽑기 싫은 서번트 선택</button>
+    <div class="spacer"></div>
+    <button class="btn danger" onclick="clearSkip()">제외 초기화</button>
+  </div>
+  <div class="summary" id="summary"></div>
+  <div id="bagWrap"></div>
+</div>
+
+<!-- ══ STEP 3 ══ -->
+<div class="view hide" id="v3">
+  <div class="bar">
+    <span class="lbl">열</span>
+    <select class="sel" id="colSel3" onchange="applyCols()">
+      <option value="0" selected>자동 (화면 폭에 맞춤)</option>
+      <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+    </select>
+    <div class="spacer"></div>
+    <button class="btn danger" onclick="clearPick()">고민 목록 비우기</button>
+  </div>
+  <div class="summary" id="summary3"></div>
+  <div id="pickWrap"></div>
+</div>
+
+<!-- ══ 참고 : JP 관위대관전 ══ -->
+<div class="view hide" id="v4">
+  <div class="bar" id="kanNav" style="position:sticky;top:0;z-index:20"></div>
+  <div style="font-size:11px;color:var(--t3);margin:0 2px 8px">
+    (깊생용) 미래시 일본 관위대관전 + 올캐러가챠 픽업 구성
+  </div>
+  <div id="kanWrap"></div>
+</div>
+
+<div class="foot" id="foot">
+  <span class="stat" id="fstat">—</span>
+  <div class="spacer"></div>
+  <button class="btn danger" onclick="clearOwn()">보유 초기화</button>
+  <button class="btn acc" id="btnGo" onclick="goStep(2)">확인 → 확챠 표 보기</button>
+</div>
+
+<!-- 2단계 전용 아래 바 — 버튼 하나만 -->
+<div class="foot" id="foot2" style="display:none">
+  <div class="spacer"></div>
+  <button class="btn acc" onclick="goStep(3)">체크 → 어디를 돌릴까</button>
+</div>
+
+<!-- 인식 진행 표시 -->
+<div class="mbg" id="recOv">
+  <div class="mbox" style="width:min(360px,90vw);align-items:center;padding:26px 20px;text-align:center">
+    <div style="font-size:26px;margin-bottom:10px"><span class="spin" style="width:22px;height:22px;border-width:3px"></span></div>
+    <div id="recSt" style="font-size:12.5px;color:var(--t2)">준비 중…</div>
+    <div style="font-size:11px;color:var(--t3);margin-top:8px">사진은 이 기기 안에서만 처리되며 어디에도 보내지 않습니다</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════ STATE ══════════ */
+let svtAll   = [];              // {id,no,name,face,rarity,cls}
+let svtById  = new Map();
+let gachaAll = [];              // 복주머니 원본
+let events   = [];              // [{key,label,gachas:[]}]
+let bags     = [];              // [{bid,name,grp:'R'|'W'|'N',ids:[]}]
+let kanui    = null;            // (참고) JP 관위대관전 — 처음 열 때 한 번만 받는다
+let pick     = new Set();       // 고민 중인 백. bid 는 새로 그릴 때마다 바뀌므로 '그룹|이름' 으로 기억한다.
+                                // 이름만 쓰면 안 된다 — 여성/남성에 '삼기사 · 버스터보구 ①' 처럼 같은 이름이 있다.
+let evtLabel = '';
+let own      = {};              // svtId -> np(1~5)
+let skip     = new Set();       // svtId
+let step     = 1;
+let skipMode = false;
+let cFilter  = new Set();
+/* ★5 는 기간한정·통상 구분 없이 전부 보여준다.
+   확챠 대상만 걸러도 캡쳐 인식은 통상까지 잡아내므로 숨겨봐야 혼란만 준다. */
+let bagCnt   = 0;
+
+/* 클래스 칩. 엑스트라는 복주머니 확챠가 나누는 방식 그대로 2개로 묶었다.
+   (JP 福袋 데이터 실측: Ⅰ=룰러·어벤저·문캔서 / Ⅱ=알터에고·포리너·프리텐더, 겹침 없음)
+   비스트는 확챠에 안 나오지만 어디든 들어가야 해서 Ⅱ에 붙였다. */
+const CLASSES = [
+  ['saber','세이버'],['archer','아처'],['lancer','랜서'],['rider','라이더'],
+  ['caster','캐스터'],['assassin','어새신'],['berserker','버서커'],
+  ['ruler|avenger|moonCancer','엑스트라Ⅰ'],
+  ['alterEgo|foreigner|pretender|beast','엑스트라Ⅱ'],
+];
+const LS_OWN='fgo_gp_own_v1', LS_SKIP='fgo_gp_skip_v1', LS_BAGS='fgo_gp_bags_v1',
+      LS_OP='fgo_gp_op_v1', LS_SRV='fgo_gp_srv_v1', LS_PICK='fgo_gp_pick_v1';
+
+/* ★5 배포 서번트 — 확챠에 안 나오므로 목록·통계에서 뺀다.
+   Atlas 원본에 '배포' 여부 필드가 없어 도감번호로 직접 관리한다.
+   FGO 9년간 ★5 배포는 솔로몬(459) 하나뿐이라 목록 유지 비용은 사실상 없다. */
+const WELFARE_NO = new Set([459]);
+
+/* 어느 서버 기준으로 셀지. 한국은 리처드 1세(432)가 끝이라 컷오프 번호를 따로 두지 않고
+   KR출시 플래그를 쓴다. 데이터만 갱신하면 컷오프가 저절로 최신이 된다. */
+let srv = 'KR';          // 'KR' | 'JP'
+let srvManual = false;   // 사용자가 직접 고르면 캡쳐 판별로 덮어쓰지 않는다
+
+const isGachaSvt = s => s.rarity === 5 && !WELFARE_NO.has(s.no);
+const inServer   = s => srv === 'JP' || s.kr === 1;
+
+/* 보구레벨 합계와 보유율. 분모는 서버별 확챠 대상 ★5. */
+function calcStats(){
+  const pool  = svtAll.filter(s => isGachaSvt(s) && inServer(s));
+  const owned = pool.filter(s => own[s.id] > 0);
+  const sum   = owned.reduce((a,s) => a + own[s.id], 0);
+  return { sum, cnt:owned.length, total:pool.length,
+           pct: pool.length ? owned.length/pool.length*100 : 0 };
+}
+function statText(){
+  const t = calcStats();
+  return `보렙총합 ${t.sum} · ★5 ${t.cnt}/${t.total} (${t.pct.toFixed(1)}%)`;
+}
+function setSrv(v, manual){
+  if(srv === v && !manual) return;
+  srv = v;
+  if(manual) srvManual = true;
+  localStorage.setItem(LS_SRV, JSON.stringify({srv, manual:srvManual}));
+  renderSvt(); updFoot();
+}
+
+/* ══════════ INIT ══════════ */
+window.addEventListener('DOMContentLoaded', init);
+
+async function init(){
+  restoreLocal();
+  buildClsChips();
+  applyCols();
+  const op = localStorage.getItem(LS_OP) || '65';
+  document.getElementById('opRange').value = op;
+  setOp(op);
+  try{
+    await loadSvt();
+    renderSvt();
+  }catch(e){
+    document.getElementById('sgrid').innerHTML =
+      '<div class="empty"><b>서번트 목록을 불러오지 못했습니다</b>Atlas Academy API 응답이 없습니다. 잠시 뒤 새로고침해 주세요.</div>';
+  }
+  try{ await loadGacha(); }catch(e){
+    document.getElementById('evtSel').innerHTML = '<option value="">확챠 목록 로드 실패</option>';
+  }
+  if(bags.length){ renderBags(); }
+  updFoot();
+}
+
+function restoreLocal(){
+  try{ own  = JSON.parse(localStorage.getItem(LS_OWN)  || '{}'); }catch(e){ own={}; }
+  try{ skip = new Set(JSON.parse(localStorage.getItem(LS_SKIP) || '[]')); }catch(e){ skip=new Set(); }
+  try{ pick = new Set(JSON.parse(localStorage.getItem(LS_PICK) || '[]')); }catch(e){ pick=new Set(); }
+  localStorage.removeItem(LS_BAGS);      // 옛 버전이 저장해둔 확챠표 청소
+  try{ const v=JSON.parse(localStorage.getItem(LS_SRV)||'null');
+       if(v){ srv=v.srv==='JP'?'JP':'KR'; srvManual=!!v.manual; } }catch(e){}
+}
+function persist(){
+  localStorage.setItem(LS_OWN,  JSON.stringify(own));
+  localStorage.setItem(LS_SKIP, JSON.stringify([...skip]));
+  localStorage.setItem(LS_PICK, JSON.stringify([...pick]));
+}
+
+/* ══════════ 데이터 로드 ══════════ */
+async function fetchJSON(url, ms=20000){
+  const c = new AbortController();
+  const t = setTimeout(()=>c.abort(), ms);
+  try{
+    const r = await fetch(url, {signal:c.signal});
+    if(!r.ok) throw new Error(r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
+}
+
+async function loadSvt(){
+  // 예전엔 Atlas 원본(KR+JP basic_svt, 4.2MB)을 매번 받았다.
+  // 필요한 필드만 추려 21KB 로 줄인 파일을 쓴다. [id, 도감번호, 이름(KR우선), 레어도, 클래스, KR출시여부]
+  const j = await fetchJSON('data/svt.json');
+  svtAll = j.map(r => ({
+    id:r[0], no:r[1], name:r[2], rarity:r[3], cls:r[4], kr:r[5],
+    face:`https://static.atlasacademy.io/JP/Faces/f_${r[0]}0.png`,
+  }));
+  svtById = new Map(svtAll.map(s => [s.id, s]));
+}
+
+async function loadGacha(){
+  // 기본 확챠는 사이트에 넣어둔 3KB 파일에서 바로 읽는다 (네트워크 대기 없음)
+  const d = await fetchJSON('data/bags.json');
+  bagCnt = 0;
+  const preset = {
+    isPreset: true,
+    label: `${d.label} (${d.bags.length}종 中 ${d.draws}번)`,
+    bags: d.bags.map(b => ({ bid: ++bagCnt, name: b.n, grp: b.g, ids: b.s.slice() })),
+  };
+  events = [preset];
+  const sel = document.getElementById('evtSel');
+  sel.innerHTML = `<option value="0">${esc(preset.label)}</option>`;
+  sel.value = '0';
+  // 확챠표는 사용자 데이터가 아니라 파일에서 오는 값이다. 항상 새로 읽는다.
+  // (저장해뒀더니 확챠·이름이 바뀌어도 옛 표가 계속 남는 사고가 났다)
+  bags = preset.bags.map(b => ({...b, ids:b.ids.slice()}));
+  evtLabel = preset.label;
+}
+
+function changeEvent(){
+  const i = document.getElementById('evtSel').value;
+  if(i === '') return;
+  const ev = events[+i];
+  if(!ev) return;
+  bags = ev.bags.map(b => ({...b, ids:b.ids.slice()}));
+  evtLabel = ev.label;
+  persist(); renderBags();
+}
+
+/* ══════════ STEP 1 : 보유 체크 ══════════ */
+function buildClsChips(){
+  document.getElementById('clsChips').innerHTML =
+    CLASSES.map(([k,v]) => `<span class="chip" data-c="${k}" onclick="tglC('${k}',this)">${v}</span>`).join('');
+}
+function tglC(c,el){ cFilter.has(c) ? cFilter.delete(c) : cFilter.add(c); el.classList.toggle('on'); renderSvt(); }
+
+/* 칩 key는 'ruler|avenger|moonCancer' 처럼 묶여 있어서 실제 className 집합으로 편다 */
+function classSet(){
+  const s = new Set();
+  cFilter.forEach(k => k.split('|').forEach(c => s.add(c)));
+  return s;
+}
+
+function filteredSvt(){
+  const q = document.getElementById('q1').value.trim().toLowerCase();
+  const cs = cFilter.size ? classSet() : null;
+  return svtAll.filter(s => {
+    if(!isGachaSvt(s)) return false;      // 배포(솔로몬)는 확챠 대상이 아니다
+    if(cs && !cs.has(s.cls)) return false;
+    if(q && !s.name.toLowerCase().includes(q) && String(s.no) !== q) return false;
+    return true;
+  });
+}
+
+function renderSvt(){
+  const list = filteredSvt();
+  const el = document.getElementById('sgrid');
+  if(!list.length){ el.innerHTML = '<div class="empty">조건에 맞는 서번트가 없습니다</div>'; updFoot(); return; }
+  el.innerHTML = list.map(s => svtCard(s)).join('');
+  updFoot();
+}
+
+function svtCard(s){
+  const np = own[s.id] || 0;
+  return `<div class="sc${np?' owned':''}${inServer(s)?'':' off'}" data-id="${s.id}"
+      onclick="cycNP(${s.id},1)" oncontextmenu="cycNP(${s.id},-1);return false">
+    <span class="no">${s.no}</span>
+    ${np ? `<span class="np${np>=5?' max':''}">${np}</span>` : ''}
+    <img src="${s.face}" loading="lazy" crossorigin="anonymous" alt=""/>
+    <span class="nm">${esc(s.name)}</span>
+  </div>`;
+}
+
+function cycNP(id, dir){
+  const cur = own[id] || 0;
+  let nx = cur + dir;
+  if(nx > 5) nx = 0;
+  if(nx < 0) nx = 5;
+  if(nx === 0) delete own[id]; else own[id] = nx;
+  persist();
+  // 카드 하나만 갱신 (전체 리렌더 시 스크롤이 튀는 것 방지)
+  const card = document.querySelector(`.sc[data-id="${id}"]`);
+  const s = svtById.get(id);
+  if(card && s) card.outerHTML = svtCard(s);
+  updFoot();
+  if(step === 2) renderBags();
+}
+
+function clearOwn(){
+  if(!confirm('보유 체크를 전부 지울까요?')) return;
+  own = {}; persist(); renderSvt(); renderBags(); toast('보유 체크를 지웠습니다');
+}
+
+function updFoot(){
+  const n = Object.keys(own).length;
+  const np5 = Object.values(own).filter(v => v >= 5).length;
+  document.getElementById('fstat').innerHTML =
+    `<span class="srvsel">` +
+      `<b class="srv${srv==='KR'?' on':''}" onclick="setSrv('KR',true)">한국</b>` +
+      `<b class="srv${srv==='JP'?' on':''}" onclick="setSrv('JP',true)">일본</b>` +
+    `</span>` +
+    `${statText()} · 제외 <b>${skip.size}</b>기` +
+    (bags.length ? ` · 복주머니 <b>${bags.length}</b>개` : '');
+}
+
+/* ══════════ 참고 : JP 관위대관전 ══════════
+   한국에 아직 안 들어온 일본 이벤트라 '참고'다. 확챠 플래너 흐름(1→2→3)에는 안 섞는다.
+   시간순은 관위전 1차 → 관위전 2차(복각) → 올캐러(12월 전 서번트 픽업)다.
+   기본은 가장 이른 관위전 1차. 뒤 회차에서 ★4 짝이 바뀐 것만 '복각'·'올캐러' 로 덧붙인다. */
+async function loadKanui(){
+  if(kanui){ renderKanui(); return; }
+  const wrap = document.getElementById('kanWrap');
+  wrap.innerHTML = `<div class="empty"><span class="spin"></span> 관위전 자료를 받는 중…</div>`;
+  try{
+    kanui = await fetchJSON('data/kanui.json');
+    renderKanui();
+  }catch(e){
+    wrap.innerHTML = `<div class="empty"><b>자료를 받지 못했습니다</b>잠시 뒤 다시 열어주세요.</div>`;
+  }
+}
+
+function kanFace(id, small){
+  const s = svtById.get(id);
+  if(!s) return '';
+  const np = own[id] || 0;                       // 보유 표시는 ★5 만 (1단계가 ★5 만 다룬다)
+  const cls = 'fc kf' + (small ? ' sm' : '') + (np ? ' own' : '');
+  return `<div class="${cls}" title="${esc(s.name)}">
+    <img src="${s.face}" loading="lazy" crossorigin="anonymous" alt=""/>
+    ${np ? `<span class="np${np>=5?' max':''}">${np}</span>` : ''}
+  </div>`;
+}
+
+/* 클래스마다 최대 칸 수가 다르다(아처는 ★5+★4 둘뿐, 세이버는 넷).
+   그 클래스에 필요한 만큼만 칸을 잡아 빈 자리를 줄인다. */
+function kanWidth(o){
+  const b = Math.max(...o.r.map(r => (r.b||[]).length));
+  const a = Math.max(...o.r.map(r => (r.k?1:0) + (r.z?1:0)));
+  return 14 + 66 + b*57 + (a ? 5 + a*59 + (a-1)*7 : 0) + 2;
+}
+
+function renderKanui(){
+  const nav = document.getElementById('kanNav');
+  const wrap = document.getElementById('kanWrap');
+  nav.innerHTML = kanui.g.map(o =>
+    `<button class="kbtn" onclick="document.getElementById('k_${o.c}').scrollIntoView({behavior:'smooth'})">${esc(o.l)}</button>`
+  ).join('');
+  wrap.innerHTML = kanui.g.map(o => `
+    <div class="ksec" id="k_${o.c}">
+      <div class="kgrid" style="--kw:${kanWidth(o)}px">
+        <h3>${esc(o.l)}</h3>${o.r.map(r => `<div class="kcard">
+        <span class="kmain">${kanFace(r.a)}${r.b.map(i=>kanFace(i,true)).join('')}</span>
+        ${(r.k||r.z) ? `<span class="kalt">
+          ${r.k ? `<span class="kgrp re"><span class="cap">복각</span>
+                   <span class="row">${r.k.map(i=>kanFace(i,true)).join('')}</span></span>` : ''}
+          ${r.z ? `<span class="kgrp re al"><span class="cap">올캐러</span>
+                   <span class="row">${r.z.map(i=>kanFace(i,true)).join('')}</span></span>` : ''}
+        </span>` : ''}
+      </div>`).join('')}</div>
+    </div>`).join('');
+}
+
+/* ══════════ STEP 2 : 복주머니 표 ══════════ */
+function goStep(n){
+  step = n;
+  for(const k of [1,2,3,4]){
+    document.getElementById('stp'+k).classList.toggle('active', n===k);
+    document.getElementById('v'+k).classList.toggle('hide', n!==k);
+  }
+  document.getElementById('foot').style.display  = n===1 ? '' : 'none';
+  document.getElementById('foot2').style.display = n===2 ? '' : 'none';
+  const bp = document.getElementById('btnPng');
+  if(bp) bp.title = n===1 ? '보유 체크한 그대로 이미지로 저장'
+                  : n===2 ? '확챠표를 이미지로 저장'
+                  : n===3 ? '고민 중인 복주머니를 이미지로 저장' : '참고 자료 — 저장 없음';
+  if(n===2) renderBags();
+  if(n===3){ renderPick(); applyCols(); }
+  if(n===4) loadKanui();
+}
+
+function applyCols(){
+  const c = document.getElementById('colSel').value;
+  document.getElementById('bagWrap').style.gridTemplateColumns =
+    c === '0' ? 'repeat(auto-fill,minmax(470px,1fr))' : `repeat(${c},1fr)`;
+  const c3 = document.getElementById('colSel3').value;
+  document.getElementById('pickWrap').style.gridTemplateColumns =
+    c3 === '0' ? 'repeat(auto-fill,minmax(470px,1fr))' : `repeat(${c3},1fr)`;
+}
+
+const bagKey = b => b.grp + '|' + b.name;
+
+function bagHTML(b, withPick){
+  const gl = b.grp === 'R' ? 'RED' : b.grp === 'W' ? 'WHITE' : '—';
+  const on = pick.has(bagKey(b));
+  return `<div class="bag${on?' pick':''}" data-bid="${b.bid}"${withPick?` onclick="tglPick(${b.bid},event)"`:''}>
+    <div class="bag-hd">
+      <span class="grp ${b.grp}">${gl}</span>
+      <span class="bag-nm">${esc(b.name)}</span>
+    </div>
+    <div class="bag-body">
+      ${b.ids.map(id => faceCell(b.bid, id)).join('')}
+    </div>
+  </div>`;
+}
+
+function renderBags(){
+  const wrap = document.getElementById('bagWrap');
+  if(!bags.length){
+    wrap.innerHTML = `<div class="empty"><b>확챠 표가 없습니다</b>
+      상단 목록에서 확챠를 고르세요.</div>`;
+    document.getElementById('summary').innerHTML = '';
+    return;
+  }
+  wrap.innerHTML = bags.map(b => bagHTML(b, true)).join('');
+  document.getElementById('summary').innerHTML =
+    `${esc(evtLabel || '확챠')} · 복주머니 <span class="hl">${bags.length}</span>개` +
+    ` · 고민 <span class="hl">${pickList().length}</span>개` +
+    `<span style="color:var(--t3);font-size:12px"> — 백 이름줄을 눌러 담으세요</span>`;
+  updFoot();
+}
+
+/* 고민 목록은 백 '이름'으로 기억한다. 확챠를 다시 불러오면 bid 가 새로 매겨지기 때문이다. */
+function pickList(){ return bags.filter(b => pick.has(bagKey(b))); }
+
+function tglPick(bid, ev){
+  // 서번트 칸을 누른 건 '제외' 조작이라 백 담기로 새지 않게 막는다
+  if(ev && ev.target && ev.target.closest && ev.target.closest('.fc')) return;
+  const b = bags.find(x => x.bid === bid);
+  if(!b) return;
+  const k = bagKey(b);
+  pick.has(k) ? pick.delete(k) : pick.add(k);
+  persist(); renderBags(); renderPick();
+}
+function clearPick(){
+  if(!pick.size) return;
+  if(!confirm('고민 목록을 비울까요?')) return;
+  pick.clear(); persist(); renderBags(); renderPick(); toast('고민 목록을 비웠습니다');
+}
+
+function renderPick(){
+  const wrap = document.getElementById('pickWrap');
+  const list = pickList();
+  if(!list.length){          // 안내문 없이 비워 둔다
+    wrap.innerHTML = '';
+    document.getElementById('summary3').innerHTML = '';
+    return;
+  }
+  wrap.innerHTML = list.map(b => bagHTML(b, false)).join('');
+  document.getElementById('summary3').innerHTML =
+    `고민 중인 복주머니 <span class="hl">${list.length}</span>개` +
+    (evtLabel ? ` · ${esc(evtLabel)}` : '');
+}
+
+function setOp(v){
+  document.documentElement.style.setProperty('--skpop', (v/100).toFixed(2));
+  document.getElementById('opVal').textContent = v + '%';
+  localStorage.setItem(LS_OP, v);
+}
+
+function faceCell(bid, id){
+  const s = svtById.get(id);
+  const face = s ? s.face : `https://static.atlasacademy.io/JP/Faces/f_${id}0.png`;
+  const nm = s ? s.name : ('#' + id);
+  const np = own[id] || 0;
+  let cls = 'st-new', txt = '';
+  if(skip.has(id))      cls = 'st-skip';
+  else if(np){ cls = 'st-own' + (np>=5 ? ' np5' : ''); txt = String(np); }
+  return `<div class="fc ${cls}" data-id="${id}" onclick="clickFace(${bid},${id})">
+    <img src="${face}" loading="lazy" crossorigin="anonymous" alt=""/>
+    <span class="ov">${txt}</span>
+  </div>`;
+}
+
+function clickFace(bid, id){
+  if(!skipMode) return;
+  skip.has(id) ? skip.delete(id) : skip.add(id);
+  persist(); renderBags();
+}
+
+function tglSkipMode(){
+  skipMode = !skipMode;
+  document.body.classList.toggle('skipmode', skipMode);
+  document.getElementById('btnSkip').classList.toggle('on', skipMode);
+  toast(skipMode ? '뽑기 싫은 서번트를 클릭하세요' : '제외 선택을 마쳤습니다');
+}
+function clearSkip(){
+  if(!skip.size) return;
+  if(!confirm('제외 표시를 전부 지울까요?')) return;
+  skip.clear(); persist(); renderBags(); toast('제외를 지웠습니다');
+}
+
+
+
+/* ══════════ 불러오기 ══════════ */
+function loadFile(input){
+  const fs = [...(input.files||[])]; if(!fs.length) return;
+  const seen = new Set();
+  const imgs = fs.filter(f => {
+    if(!/^image\//.test(f.type)) return false;
+    const k = f.name + '|' + f.size;          // 같은 파일을 두 번 고른 경우 한 번만
+    if(seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+  if(imgs.length){                       // 영기일람 스크린샷
+    input.value = '';
+    recognizeShots(imgs);
+    return;
+  }
+  toast('영기일람 스크린샷 이미지를 올려주세요');
+  input.value='';
+}
+
+/* 만들어 둔 화면 밖 상자를 그림으로 굽는다. 두 내보내기가 같은 처리를 쓴다. */
+async function bakePNG(box, name, maxScale){
+  document.body.appendChild(box);
+  try{
+    /* 화면 밖 요소는 lazy 로딩이 영영 시작되지 않아 그대로 두면 무한 대기한다.
+       1단계 그림은 아이콘이 200장 가까이라 6초로는 폰에서 절반도 못 받는다.
+       장수에 맞춰 기다리고, 얼마나 받았는지 알려준다. */
+    const imgs=[...box.querySelectorAll('img')];
+    imgs.forEach(im => { im.loading='eager'; if(!im.src) im.src=im.getAttribute('src')||''; });
+    const wait = Math.min(40000, 8000 + imgs.length*80);
+    let done=0;
+    await Promise.all(imgs.map(im => im.complete ? (done++, null) : new Promise(r => {
+      const fin=()=>{ done++; r(); };
+      im.onload=fin; im.onerror=fin; setTimeout(r, wait);
+    })));
+    if(imgs.length && done < imgs.length*0.9)
+      toast(`아이콘 ${done}/${imgs.length}장만 받았습니다 — 그대로 만듭니다`);
+    // 폰은 캔버스 크기 한계가 있어서 배율을 그대로 두면 아래가 잘려 나온다.
+    const bw = box.offsetWidth, bh = box.offsetHeight;
+    let scale = maxScale || 2;
+    // 폰은 캔버스 상한이 낮다. PNG 로 굽다가 조용히 실패하는 걸 막으려 여유를 더 둔다.
+    const MAXPX = isIOS || /Android/.test(navigator.userAgent) ? 8e6 : 12e6;
+    while(scale > 0.4 && (bw*scale > 4000 || bh*scale > 4000 || bw*scale*bh*scale > MAXPX)) scale -= 0.2;
+    const cv = await html2canvas(box, {
+      backgroundColor:'#f7f5f0', scale, useCORS:true, allowTaint:false,
+      width: bw, height: bh, windowWidth: bw, windowHeight: bh, scrollX:0, scrollY:0,
+    });
+    if(!cv.width || !cv.height) throw new Error('이미지를 만들지 못했습니다');
+    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    if(!blob) throw new Error('이미지를 만들지 못했습니다');
+    await savePNG(blob, name, cv.width, cv.height);
+  }catch(e){
+    // 원인을 감추면 제보를 받아도 손을 못 댄다
+    toast('이미지 저장 실패 — ' + ((e && e.message) || e));
+  }finally{ box.remove(); }
+}
+
+/* 1단계(보유 체크) 화면을 그대로 저장한다. 확챠 표로 넘어가지 않는다.
+   글자·제목 없이 서번트 칸만 남긴다. */
+async function exportOwnPNG(){
+  const grid = document.getElementById('sgrid');
+  const cards = grid ? grid.querySelectorAll('.sc') : [];
+  if(!cards.length){ toast('내보낼 서번트가 없습니다'); return; }
+  toast('이미지 만드는 중…');
+
+  // 화면 폭에 따라 열이 달라지면 폰에서 세로로 길쭉해진다. 칸 수에 맞춰 가로세로가 고르게.
+  const CW = 104, GAP = 5;
+  const COL = Math.max(8, Math.min(20, Math.round(Math.sqrt(cards.length * 1.4))));
+  const W = COL*CW + (COL-1)*GAP;
+
+  const box = document.createElement('div');
+  box.style.cssText = `position:fixed; left:-99999px; top:0; width:${W+24}px;
+    padding:12px; background:#f7f5f0; box-sizing:border-box;`;
+  const clone = grid.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.style.cssText = `display:grid; gap:${GAP}px; width:${W}px;
+    grid-template-columns:repeat(${COL}, ${CW}px);`;
+  clone.querySelectorAll('.sc').forEach(c => { c.removeAttribute('onclick'); c.removeAttribute('oncontextmenu'); });
+
+  /* 마지막 줄 남은 칸을 합쳐 우측 아래에 숫자를 넣는다.
+     칸이 딱 떨어지면 span 이 한 줄 전체가 되어 새 줄이 생긴다 — 예외 처리가 필요 없다.
+     단, 검색·클래스 필터가 걸려 있으면 그림의 칸수와 분모가 어긋나므로 넣지 않는다. */
+  const filtered = cFilter.size > 0 || document.getElementById('q1').value.trim() !== '';
+  if(!filtered){
+    const rem = cards.length % COL;
+    // 남은 칸이 너무 좁으면 글자가 개미만 해진다. 3칸 이하면 아예 한 줄을 새로 쓴다.
+    let span = rem ? COL - rem : COL;
+    if(span < 4) span = COL;
+    const availW = span*CW + (span-1)*GAP - 8;
+    const txt = statText();
+    // 실제 글자 폭을 재서 칸에 꽉 차게 키운다 (칸 높이 104px 를 넘지 않게 상한)
+    const mc = document.createElement('canvas').getContext('2d');
+    let fs = 64;
+    for(; fs > 11; fs--){
+      mc.font = `700 ${fs}px system-ui, -apple-system, sans-serif`;
+      if(mc.measureText(txt).width <= availW) break;
+    }
+    fs = Math.min(fs, Math.round(CW * 0.35));
+    const cell = document.createElement('div');
+    cell.style.cssText = `grid-column:span ${span}; display:flex; align-items:flex-end;
+      justify-content:flex-end; padding:0 4px 4px; line-height:1.2; white-space:nowrap;
+      font-size:${fs}px; font-weight:700; color:#1a1814;`;
+    cell.textContent = txt;
+    clone.appendChild(cell);
+  }
+  box.appendChild(clone);
+  // 아이콘은 104px 로도 충분히 또렷하다. 2배로 뽑으면 파일이 17MB 를 넘어 공유가 어렵다.
+  await bakePNG(box, `보유서번트_${new Date().toISOString().slice(0,10)}.png`, 1);
+}
+
+async function exportPNG(){
+  if(step === 4){ toast('참고 자료라 저장은 없습니다'); return; }
+  if(step === 1) return exportOwnPNG();
+  if(step === 3 && !pickList().length){ toast('고민 목록이 비어 있습니다'); return; }
+  if(!bags.length){ toast('내보낼 표가 없습니다'); return; }
+  if(skipMode) tglSkipMode();
+  toast('이미지 만드는 중…');
+
+  // 화면 요소를 그대로 찍으면 스크롤 영역·여백 때문에 아래가 텅 비고 끝줄이 잘린다.
+  // 표만 복제해 화면 밖 컨테이너에 담고 그것만 찍는다.
+  // 폰에서 찍으면 화면이 좁아 표가 찌그러진다. 내보내기는 화면 폭과 무관하게 고정 3열로 그린다.
+  const wrap = document.getElementById(step === 3 ? 'pickWrap' : 'bagWrap');
+  const n = step === 3 ? pickList().length : bags.length;
+  // 고민 목록은 2열로 굽는다 (확챠표는 예전대로 3열)
+  const COL = step === 3 ? Math.min(2, Math.max(1, n)) : 3;
+  const COLW = 470, GAP = 9;
+  const W = COL*COLW + (COL-1)*GAP;
+  const box = document.createElement('div');
+  box.className='pngbox';
+  box.style.cssText = `position:fixed; left:-99999px; top:0; width:${W+28}px;
+    padding:14px; background:#f7f5f0; box-sizing:border-box;`;
+  // 고민 목록은 제목 없이 백만 굽는다
+  const ttl = document.createElement('div');
+  if(step !== 3){
+    ttl.style.cssText = 'font-size:15px;font-weight:700;color:#1a1814;margin:2px 2px 11px';
+    ttl.textContent = evtLabel || '복주머니';
+  }
+  const clone = wrap.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.style.cssText = getComputedStyle(wrap).cssText || '';
+  clone.style.display = 'grid';
+  clone.style.gap = '9px';
+  clone.style.gridTemplateColumns = `repeat(${COL}, ${COLW}px)`;
+  clone.style.width = W + 'px';
+
+  box.appendChild(ttl); box.appendChild(clone);
+  await bakePNG(box, `${step===3?'고민목록':'복주머니'}_${new Date().toISOString().slice(0,10)}.png`);
+}
+
+
+/* 저장 경로는 아이폰만 다르다.
+   아이폰 Safari 는 링크의 download 속성을 무시해서, 눌러도 아무 일이 없거나
+   사진앱이 아닌 엉뚱한 곳으로 가 "받았는데 안 보인다"가 된다. 그래서 공유시트를 쓴다.
+   반대로 안드로이드·PC 는 공유시트를 띄우면 정작 저장이 막힌다.
+   (실측: 갤럭시는 공유창에 그림만 뜨고 저장이 안 됨, 윈도우도 마찬가지)
+   둘은 그냥 내려받으면 다운로드함에 잘 들어간다. */
+const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+/* 카톡·인스타 등 앱 안에서 열린 브라우저는 파일 내려받기가 막혀 있는 경우가 많다.
+   눌러도 아무 일이 없거나 공유창만 뜨고 저장이 안 된다. 이때는 이미지를 띄워 길게 누르게 한다. */
+const isInApp = /KAKAOTALK|FB_IAB|FBAN|FBAV|Instagram|Line\/|NAVER\(inapp|DaumApps|everytimeApp|Twitter|Snapchat/i
+  .test(navigator.userAgent);
+
+function download(blob, name, w, h){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 10000);
+  toast(`PNG 저장 완료 (${w}×${h})`);
+}
+
+async function savePNG(blob, name, w, h){
+  const file = new File([blob], name, {type:'image/png'});
+  if(isInApp) return showSaveSheet(blob, name, file);   // 앱 안 브라우저는 내려받기가 막힌다
+  if(!isIOS)  return download(blob, name, w, h);        // 안드로이드·PC 는 바로 내려받기
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file], title:name});
+      toast('저장했습니다');
+      return;
+    }catch(err){
+      if(err && err.name === 'AbortError') return;   // 사용자가 직접 닫음
+      // 화면을 그리는 데 시간이 걸려 '누른 직후'가 아니게 되면 막힌다 → 아래로 넘어간다
+    }
+  }
+  showSaveSheet(blob, name, file);   // 공유시트가 막히면 길게 눌러 사진에 추가
+}
+
+/* 마지막 수단 — 만든 이미지를 그대로 띄운다. 길게 눌러 저장하는 건 어디서나 된다. */
+function showSaveSheet(blob, name, file){
+  const url = URL.createObjectURL(blob);
+  const ov = document.createElement('div');
+  ov.style.cssText = `position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.82);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; padding:16px; box-sizing:border-box;`;
+  ov.innerHTML = `
+    <div style="color:#fff;font-size:15px;line-height:1.5;text-align:center">
+      이미지를 <b>길게 눌러</b> ‘이미지 저장’(아이폰은 ‘사진에 추가’)을 누르세요<br>
+      <span style="font-size:12px;opacity:.75">앱 안에서 열면 저장이 막힐 수 있습니다 — 브라우저로 열면 바로 받아집니다</span>
+    </div>
+    <img src="${url}" alt="확챠표"
+         style="max-width:100%;max-height:66vh;border-radius:8px;background:#f7f5f0">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+      <button id="pngShare" style="padding:11px 18px;font-size:15px;border:0;border-radius:8px;
+        background:#c2453f;color:#fff">공유 / 저장</button>
+      <button id="pngClose" style="padding:11px 18px;font-size:15px;border:0;border-radius:8px;
+        background:#fff;color:#222">닫기</button>
+    </div>`;
+  const close = () => { ov.remove(); setTimeout(()=>URL.revokeObjectURL(url), 1000); };
+  ov.querySelector('#pngClose').onclick = close;
+  ov.querySelector('#pngShare').onclick = async () => {
+    // 여기서는 방금 누른 직후라 공유시트가 확실히 열린다
+    try{
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file], title:name});
+        close(); return;
+      }
+    }catch(err){ if(err && err.name === 'AbortError') return; }
+    window.open(url, '_blank');
+  };
+  document.body.appendChild(ov);
+}
+
+/* ══════════════════════════════════════════════════════════
+   캡쳐 인식 엔진
+   영기일람 스크린샷 → 격자 검출 → 자기보정 → 얼굴 대조 → 보구 숫자
+   여러 장을 한 번에 올려도 되고, 겹친 줄은 서번트 ID로 자동 합쳐진다.
+   ══════════════════════════════════════════════════════════ */
+let REC = null;                       // 인식 모델 (한 번만 받는다)
+// 실측 근거: 격자가 제대로 맞은 칸 329개의 s1 최소 0.880, gap 최소 0.110.
+// 반면 화면에 가려 검증 불가한 칸들이 0.63~0.75 로 통과하고 있었다.
+const REC_TH = { s1: 0.75, gap: 0.08, card: 0.10, s1Lo: 0.55, gapHi: 0.12 };
+/* 게임 상단 UI에 가리거나 아래가 잘린 카드는 점수가 통째로 내려앉는다.
+   그래도 2등을 크게 따돌렸다면(gap 0.12) 낮은 점수라도 받는다.
+   실측: 확인된 112기·61기 세트에서 이 문턱을 0.05 까지 낮춰도 가짜가 0건이었다.
+   0.15 로 두면 에레쉬키갈(0.72 / 0.144)처럼 멀쩡한 카드가 턱걸이로 떨어진다. */
+const isSure = c => (c.s1>=REC_TH.s1 && c.gap>=REC_TH.gap) || (c.s1>=REC_TH.s1Lo && c.gap>=REC_TH.gapHi);
+const REC_VER = 'v13 2026-08-10';   // 인식 엔진 버전 (캐시 확인용)
+
+async function loadRecModel(){
+  if(REC) return REC;
+  /* 주소 뒤에 버전을 붙인다. 이게 없으면 브라우저가 예전 모델을 계속 쓴다.
+     실측: 종화 제외용 템플릿을 추가했는데도 기존 방문자에게는 반영되지 않아
+     종화 화면 인식이 통째로 실패했다. 모델을 바꾸면 REC_VER 도 같이 올릴 것. */
+  const V = '?v=' + encodeURIComponent(REC_VER);
+  const [meta, dg, buf] = await Promise.all([
+    fetchJSON('data/faces.json'+V),
+    fetchJSON('data/digits.json'+V),
+    fetch('data/faces.bin'+V).then(r => r.arrayBuffer()),
+  ]);
+  const raw = new Int8Array(buf), n = meta.n, dim = meta.dim;
+  // int8 → 평균 제거 후 단위벡터 (양자화 스케일은 정규화로 사라진다)
+  const M = new Float32Array(n * dim);
+  for(let i=0;i<n;i++){
+    const o=i*dim; let s=0;
+    for(let j=0;j<dim;j++) s += raw[o+j];
+    const m = s/dim; let q=0;
+    for(let j=0;j<dim;j++){ const v = raw[o+j]-m; M[o+j]=v; q+=v*v; }
+    const inv = 1/(Math.sqrt(q)||1);
+    for(let j=0;j<dim;j++) M[o+j]*=inv;
+  }
+  // 숫자 모델도 같은 방식
+  const dn = dg.x.length, dd = dg.x[0].length;
+  const DX = new Float32Array(dn*dd);
+  for(let i=0;i<dn;i++){
+    const r=dg.x[i]; let s=0;
+    for(let j=0;j<dd;j++) s+=r[j];
+    const m=s/dd; let q=0;
+    for(let j=0;j<dd;j++){ const v=r[j]-m; DX[i*dd+j]=v; q+=v*v; }
+    const inv=1/(Math.sqrt(q)||1);
+    for(let j=0;j<dd;j++) DX[i*dd+j]*=inv;
+  }
+  REC = { meta, M, ids: meta.ids, S: meta.S, box: meta.box, dim,
+          dg: { X: DX, Y: dg.y, n: dn, d: dd, box: dg.box, w: dg.w, h: dg.h },
+          lbl: dg.lbl ? { box:dg.lbl.box, w:dg.lbl.w, h:dg.lbl.h,
+                          kr:Float32Array.from(dg.lbl.kr), jp:Float32Array.from(dg.lbl.jp) } : null };
+  return REC;
+}
+
+/* ── 이미지 → 픽셀 ── */
+function toCanvas(img){
+  const cv = document.createElement('canvas');
+  cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+  cv.getContext('2d', {willReadFrequently:true}).drawImage(img,0,0);
+  return cv;
+}
+function loadImg(file){
+  return new Promise((res,rej)=>{
+    const u=URL.createObjectURL(file), im=new Image();
+    im.onload=()=>{ URL.revokeObjectURL(u); res(im); };
+    im.onerror=()=>{ URL.revokeObjectURL(u); rej(new Error('이미지를 열 수 없습니다')); };
+    im.src=u;
+  });
+}
+
+/* ── 격자 검출 ──
+   화면 어디에 격자가 있는지 비율로 가정하지 않는다.
+   에뮬레이터 창처럼 게임 화면이 이미지의 일부일 수도 있어서,
+   금색 테두리를 전체 폭에서 훑어 간격·시작점을 직접 찾는다. */
+function detectGrid(cv){
+  const W=cv.width, H=cv.height;
+  const d=cv.getContext('2d').getImageData(0,0,W,H).data;
+  const y0=Math.round(H*0.18), y1=Math.round(H*0.98);
+  const col=new Float64Array(W);
+  for(let y=y0;y<y1;y+=2){
+    const row=y*W;
+    for(let x=0;x<W;x++){
+      const i=(row+x)*4, r=d[i], g=d[i+1], b=d[i+2];
+      if(r>150 && g>110 && b<130 && r-b>60) col[x]++;
+    }
+  }
+  let mx=0, mean=0;
+  for(let x=0;x<W;x++){ if(col[x]>mx) mx=col[x]; mean+=col[x]; }
+  mean/=W; if(!mx) return null;
+
+  const runs=[]; let st=null;
+  for(let x=0;x<W;x++){
+    const on = col[x]/mx > 0.45;
+    if(on && st===null) st=x;
+    if(!on && st!==null){ if(x-st>=3) runs.push([st,x]); st=null; }
+  }
+  if(st!==null && W-st>=3) runs.push([st,W]);
+  if(runs.length<2) return null;
+
+  // 카드 간격 = 자기상관 최대
+  const lo=Math.max(40, Math.round(W*0.04)), hi=Math.round(W*0.22);
+  let pitch=lo, bp=-Infinity;
+  for(let k=lo;k<hi;k++){
+    let sum=0; for(let x=0;x+k<W;x++) sum+=(col[x]-mean)*(col[x+k]-mean);
+    if(sum>bp){ bp=sum; pitch=k; }
+  }
+  // 카드 폭 = 간격의 55~99% 인 구간들의 중앙값
+  const ws=runs.map(r=>r[1]-r[0]).filter(w=>w>pitch*0.55 && w<pitch*0.99).sort((a,b)=>a-b);
+  const cw = ws.length ? ws[ws.length>>1] : Math.round(pitch*0.85);
+
+  // 카드 사이 '틈'의 위상을 찾아 카드 시작 위상을 구한다
+  const fold=new Float64Array(pitch);
+  for(let i=0;i<pitch;i++){ let s2=0,n=0; for(let x=i;x<W;x+=pitch){ s2+=col[x]; n++; } fold[i]=s2/n; }
+  let gap=0; for(let i=1;i<pitch;i++) if(fold[i]<fold[gap]) gap=i;
+  const phase=((gap + ((pitch-cw)>>1)) % pitch + pitch) % pitch;
+
+  const starts=[];
+  for(let x=phase;x<W-cw;x+=pitch){
+    let s2=0; for(let t=x;t<x+cw;t++) s2+=col[t];
+    if(s2/cw > mean*0.6) starts.push(x);
+  }
+  if(starts.length<2) return null;
+  let x0=starts[0];
+  // 실제 카드 왼쪽 테두리로 스냅
+  let bestd=pitch*0.35, snap=null;
+  runs.forEach(r=>{ const dd=Math.abs(r[0]-x0); if(dd<bestd){ bestd=dd; snap=r[0]; } });
+  if(snap!==null) x0=snap;
+  const ncol=starts.length;
+  if(ncol<2 || ncol>14) return null;
+
+  const xe=Math.min(x0+(ncol-1)*pitch+cw, W);
+  const row=new Float64Array(H);
+  for(let y=0;y<H;y++){
+    let s2=0; const r0=y*W;
+    for(let x=x0;x<xe;x+=2){ const i=(r0+x)*4, r=d[i], g=d[i+1], b=d[i+2];
+      if(r>150 && g>110 && b<130 && r-b>60) s2++; }
+    row[y]=s2;
+  }
+  let rm=0; for(let y=0;y<H;y++) rm+=row[y]; rm/=H;
+  let per=Math.round(pitch*0.95), bpr=-Infinity;
+  for(let k=Math.round(pitch*0.95); k<Math.round(pitch*1.30); k++){
+    let sum=0; for(let y=0;y+k<H;y++) sum+=(row[y]-rm)*(row[y+k]-rm);
+    if(sum>bpr){ bpr=sum; per=k; }
+  }
+  return { ncol, x0, cw, pitch, per, W, H };
+}
+
+/* ── 셀에 카드가 실제로 있는가 (빈 칸·UI 가림 걸러내기) ── */
+function cardPresence(ctx,x,y,size,vish){
+  const t=Math.max(3, size/22|0);
+  const im=ctx.getImageData(x,y,size,vish).data;
+  let hit=0, tot=0;
+  const scan=(px,py)=>{
+    const i=((py*size)+px)*4, r=im[i],g=im[i+1],b=im[i+2];
+    tot++; if(r>120 && r-b>35 && g>90) hit++;
+  };
+  for(let py=0;py<t;py++) for(let px=0;px<size;px+=2) scan(px,py);
+  for(let py=0;py<vish;py+=2){ for(let px=0;px<t;px++) scan(px,py); for(let px=size-t;px<size;px++) scan(px,py); }
+  if(vish>=size) for(let py=vish-t;py<vish;py++) for(let px=0;px<size;px+=2) scan(px,py);
+  return tot ? hit/tot : 0;
+}
+
+/* ── 카드 얼굴 → 특징 벡터 ──
+   축소는 캔버스에 맡기지 않고 직접 면적 평균한다.
+   브라우저마다 drawImage 축소 필터가 달라서, 맡기면 같은 사진도 기기마다 값이 달라진다.
+   (FGA가 OpenCV INTER_AREA 로 고정해 쓰는 것과 같은 이유) */
+function boxDown(ctx, l, t, w, h, OW, OH, ch){
+  /* 누적합 표가 있으면 픽셀을 안 훑고 네 모서리만 읽는다. 결과는 아래 원래 계산과 같다.
+     (사진 밖으로 나가는 부분은 예전 코드가 0 으로 읽었으므로 여기서도 잘라내 맞춘다) */
+  const S=ctx.sat;
+  if(S && w>=OW && h>=OH){
+    const {s,w1}=S, W=ctx.W, H=ctx.H, out=new Float32Array(OW*OH*ch);
+    const at=(x,y,k)=>s[(y*w1+x)*3+k];
+    for(let oy=0;oy<OH;oy++){
+      let y0=t+((oy*h/OH)|0), y1=t+Math.max(((oy*h/OH)|0)+1, ((oy+1)*h/OH)|0);
+      y0=Math.min(Math.max(y0,0),H); y1=Math.min(Math.max(y1,0),H);
+      for(let ox=0;ox<OW;ox++){
+        let x0=l+((ox*w/OW)|0), x1=l+Math.max(((ox*w/OW)|0)+1, ((ox+1)*w/OW)|0);
+        x0=Math.min(Math.max(x0,0),W); x1=Math.min(Math.max(x1,0),W);
+        const n=(x1-x0)*(y1-y0), o=(oy*OW+ox)*ch;
+        if(n<=0){ if(ch===3){out[o]=out[o+1]=out[o+2]=0;} else out[o]=0; continue; }
+        const r=at(x1,y1,0)-at(x0,y1,0)-at(x1,y0,0)+at(x0,y0,0);
+        const g=at(x1,y1,1)-at(x0,y1,1)-at(x1,y0,1)+at(x0,y0,1);
+        const b=at(x1,y1,2)-at(x0,y1,2)-at(x1,y0,2)+at(x0,y0,2);
+        if(ch===3){ out[o]=r/n; out[o+1]=g/n; out[o+2]=b/n; }
+        else out[o]=(r*0.299+g*0.587+b*0.114)/n;
+      }
+    }
+    return out;
+  }
+  const src=ctx.getImageData(l,t,w,h).data, out=new Float32Array(OW*OH*ch);
+  /* 원본이 목표보다 작으면(줄어든 캡쳐의 숫자칸 등) 면적평균은 최근접이 되어 계단이 진다.
+     이때만 선형보간으로 늘린다. 실측: 카드 93px 짜리 캡쳐에서 보구 오독이 눈에 띄게 줄었다. */
+  if(w < OW || h < OH){
+    for(let oy=0;oy<OH;oy++){
+      const fy=OH>1 ? oy*(h-1)/(OH-1) : 0, y0=fy|0, y1=Math.min(h-1,y0+1), ty=fy-y0;
+      for(let ox=0;ox<OW;ox++){
+        const fx=OW>1 ? ox*(w-1)/(OW-1) : 0, x0=fx|0, x1=Math.min(w-1,x0+1), tx=fx-x0;
+        const o=(oy*OW+ox)*ch;
+        for(let k=0;k<(ch===3?3:3);k++){
+          const a=src[(y0*w+x0)*4+k], b=src[(y0*w+x1)*4+k],
+                c2=src[(y1*w+x0)*4+k], d=src[(y1*w+x1)*4+k];
+          const v=(a*(1-tx)+b*tx)*(1-ty) + (c2*(1-tx)+d*tx)*ty;
+          if(ch===3) out[o+k]=v; else out[o] = (out[o]||0) + v*(k===0?0.299:k===1?0.587:0.114);
+        }
+      }
+    }
+    return out;
+  }
+  for(let oy=0;oy<OH;oy++){
+    const y0=(oy*h/OH)|0, y1=Math.max(y0+1, ((oy+1)*h/OH)|0);
+    for(let ox=0;ox<OW;ox++){
+      const x0=(ox*w/OW)|0, x1=Math.max(x0+1, ((ox+1)*w/OW)|0);
+      let r=0,g=0,b=0,n=0;
+      for(let yy=y0;yy<y1;yy++){
+        let i=(yy*w+x0)*4;
+        for(let xx=x0;xx<x1;xx++,i+=4){ r+=src[i]; g+=src[i+1]; b+=src[i+2]; n++; }
+      }
+      const o=(oy*OW+ox)*ch;
+      if(ch===3){ out[o]=r/n; out[o+1]=g/n; out[o+2]=b/n; }
+      else out[o]=(r*0.299+g*0.587+b*0.114)/n;
+    }
+  }
+  return out;
+}
+function normalize(v){
+  const n=v.length; let m=0;
+  for(let i=0;i<n;i++) m+=v[i]; m/=n;
+  let q=0; for(let i=0;i<n;i++){ v[i]-=m; q+=v[i]*v[i]; }
+  if(q<1e-9) return null;
+  const inv=1/Math.sqrt(q);
+  for(let i=0;i<n;i++) v[i]*=inv;
+  return v;
+}
+function faceVec(ctx, x, y, cs, vish, S, box){
+  const l=x+(box[0]*cs|0), r=x+(box[2]*cs|0);
+  const t=y+(box[1]*cs|0), b=y+Math.min(box[3]*cs|0, vish);
+  if(b-t<6 || r-l<6) return null;
+  return normalize(boxDown(ctx, l, t, r-l, b-t, S, S, 3));
+}
+/* 벡터 하나를 전체 레퍼런스와 대조 → 1등·2등(다른 서번트).
+   id 가 음수인 항목은 '서번트가 아닌 카드'(Exp.UP 등) 템플릿이다.
+   실측: Exp 카드가 길가메쉬와 0.685 로 붙어 문턱을 넘었다. 거부 템플릿은 1.0 이라 항상 이긴다. */
+function matchFace(v, stride){
+  const {M,ids,dim}=REC, n=ids.length;
+  let b1=-2,i1=-1,b2=-2;
+  for(let i=0;i<n;i+= (stride||1)){
+    const o=i*dim; let s=0;
+    for(let j=0;j<dim;j++) s+=M[o+j]*v[j];
+    if(s>b1){ if(ids[i1]!==ids[i] && ids[i1]>=0) b2=Math.max(b2,b1); b1=s; i1=i; }
+    else if(s>b2 && ids[i]!==ids[i1] && ids[i]>=0) b2=s;   // 거부 템플릿은 2등에서 뺀다
+  }
+  return { id: ids[i1], idx: i1, s1: b1, gap: b1-b2 };
+}
+/* ── 보구 숫자 ──
+   숫자칸은 20x27px 남짓이라 정렬에 아주 예민하다. 4px만 어긋나도 전부 오독한다.
+   (얼굴은 영역이 커서 9px 어긋나도 멀쩡하다 — 그래서 얼굴 보정만 믿으면 숫자가 깨진다)
+   그래서 행의 상단 띠를 한 번 읽어두고, 숫자상자 위치·크기를 따로 맞춘다. */
+function grabBand(ctx, x, y, w, h){
+  w=Math.max(1,w|0); h=Math.max(1,h|0);
+  return { d: ctx.getImageData(x|0, y|0, w, h).data, x:x|0, y:y|0, w, h };
+}
+function npFromBand(band, l, t, r, b){
+  const g=REC.dg, ow=g.w, oh=g.h;
+  const sw=r-l, sh=b-t;
+  if(sw<3 || sh<3) return {np:0,conf:0};
+  const lx=l-band.x, ty=t-band.y;
+  if(lx<0 || ty<0 || lx+sw>band.w || ty+sh>band.h) return {np:0,conf:0};
+  const v=new Float32Array(ow*oh);
+  for(let oy=0;oy<oh;oy++){
+    const y0=(oy*sh/oh)|0, y1=Math.max(y0+1,((oy+1)*sh/oh)|0);
+    for(let ox=0;ox<ow;ox++){
+      const x0=(ox*sw/ow)|0, x1=Math.max(x0+1,((ox+1)*sw/ow)|0);
+      let sum=0,n=0;
+      for(let yy=y0;yy<y1;yy++){
+        let i=(((ty+yy)*band.w)+(lx+x0))*4;
+        for(let xx=x0;xx<x1;xx++,i+=4){ sum += band.d[i]*0.299+band.d[i+1]*0.587+band.d[i+2]*0.114; n++; }
+      }
+      v[oy*ow+ox] = (sum/n) > 195 ? 1 : 0;
+    }
+  }
+  if(!normalize(v)) return {np:0,conf:0};
+  let best=-2, bi=0;
+  for(let i=0;i<g.n;i++){
+    const o=i*g.d; let s=0;
+    for(let j=0;j<g.d;j++) s+=g.X[o+j]*v[j];
+    if(s>best){ best=s; bi=i; }
+  }
+  return { np:g.Y[bi], conf:best };
+}
+/* 숫자상자 오프셋(ox,oy)·배율(sc)을 찾는다.
+   한 행만 보고 맞추면 그 행이 상단 UI에 가렸을 때 통째로 어긋난다(실측 사례 있음).
+   그래서 여러 행의 평균 확신도로 고른다. */
+/* 정렬 탐색 폭은 반드시 카드 크기에 비례해야 한다.
+   예전엔 ±14px 로 고정이라, 카톡 등으로 줄어든 캡쳐(카드 93px)에서는
+   숫자칸(7×10px)의 두 배 넘게 훑어 엉뚱한 글자에 붙었다.
+   실측: 전부 '보구5' 인 화면이 oy=-16 에 붙어 '1' 로 읽혔다. */
+const tuneR = size => Math.max(4, Math.round(size * 0.073));   // 카드 192px → ±14
+function tuneDigits(ctx, G, size, dx, ys, ncol){
+  const bx=REC.dg.box, R=tuneR(size);
+  const bands=ys.map(y => {
+    const bandY = y + (bx[1]*size|0) - (R+2);
+    const bandH = ((bx[3]-bx[1])*size*1.2|0) + (R+2)*2 + 6;
+    return { y, band: grabBand(ctx, G.x0+dx-(R+2), bandY, (ncol-1)*G.pitch + size + (R+2)*2, bandH) };
+  });
+  // 행마다 따로 점수를 내고 '가장 잘 읽히는 행'을 기준으로 삼는다.
+  // 상단 UI에 가린 행이 섞이면 평균이 끌려내려가 정렬이 통째로 어긋난다.
+  const score=(ox,oy,sc)=>{
+    const w=(bx[2]-bx[0])*size*sc, h=(bx[3]-bx[1])*size*sc;
+    let best=-1;
+    bands.forEach(({y,band}) => {
+      let tot=0;
+      for(let c=0;c<ncol;c++){
+        const x=G.x0+dx+c*G.pitch;
+        const l=x+(bx[0]*size|0)+ox, t=y+(bx[1]*size|0)+oy;
+        tot += npFromBand(band, l, t, l+w|0, t+h|0).conf;
+      }
+      const m=tot/ncol; if(m>best) best=m;
+    });
+    return best;
+  };
+  let best={conf:-1, ox:0, oy:0, sc:1};
+  for(const sc of [0.95,1.0,1.05,1.10])
+    for(let oy=-R;oy<=R;oy+=Math.max(1,R/5|0))
+      for(let ox=-R;ox<=R;ox+=Math.max(1,R/5|0)){
+        const m=score(ox,oy,sc);
+        if(m>best.conf) best={conf:m,ox,oy,sc};
+      }
+  for(const sc of [best.sc-0.05,best.sc,best.sc+0.05])
+    for(let oy=best.oy-3;oy<=best.oy+3;oy++)
+      for(let ox=best.ox-3;ox<=best.ox+3;ox++){
+        const m=score(ox,oy,sc);
+        if(m>best.conf) best={conf:m,ox,oy,sc};
+      }
+  return best;
+}
+/* 정해진 오프셋으로 한 행을 읽는다 */
+function readRowNP(ctx, G, size, dx, y, ncol, tune){
+  const bx=REC.dg.box, R=tuneR(size);
+  const bandY = y + (bx[1]*size|0) - (R+2);
+  const bandH = ((bx[3]-bx[1])*size*1.2|0) + (R+2)*2 + 6;
+  const band = grabBand(ctx, G.x0+dx-(R+2), bandY, (ncol-1)*G.pitch + size + (R+2)*2, bandH);
+  const w=(bx[2]-bx[0])*size*tune.sc, h=(bx[3]-bx[1])*size*tune.sc;
+  const out=[];
+  for(let c=0;c<ncol;c++){
+    const x=G.x0+dx+c*G.pitch;
+    const l=x+(bx[0]*size|0)+tune.ox, t=y+(bx[1]*size|0)+tune.oy;
+    out.push(npFromBand(band, l, t, l+w|0, t+h|0));
+  }
+  return out;
+}
+
+/* 카드 위쪽 '보구Lv. / 宝具Lv.' 글자를 읽어 어느 서버 캡쳐인지 본다.
+   숫자 정렬(dTune)이 이미 맞춰져 있으므로 같은 보정값을 그대로 쓰면 된다.
+   칸마다 한 표씩 던지고 다수결. 실측 28장에서 한국 캡쳐의 일본표 비율은 최대 0.39,
+   일본 캡쳐는 1.00 이라 0.70 을 넘으면 일본으로 본다 (한국 오탐 0건). */
+function readServer(ctx, G, size, dx, ys, tune){
+  const L = REC.lbl;
+  if(!L || !tune || tune.conf < 0.40) return null;
+  let jp=0, n=0;
+  for(const y of ys){
+    for(let c=0;c<G.ncol;c++){
+      const x  = G.x0 + dx + c*G.pitch;
+      const l  = (x + (L.box[0]*size|0) + tune.ox)|0;
+      const t  = (y + (L.box[1]*size|0) + tune.oy)|0;
+      const w  = (L.box[2]-L.box[0])*size*tune.sc|0;
+      const h  = (L.box[3]-L.box[1])*size*tune.sc|0;
+      if(w<8 || h<4) continue;
+      const v = normalize(boxDown(ctx, l, t, w, h, L.w, L.h, 1));
+      if(!v) continue;
+      let sk=0, sj=0;
+      for(let i=0;i<v.length;i++){ sk+=L.kr[i]*v[i]; sj+=L.jp[i]*v[i]; }
+      if(sj>sk) jp++;
+      n++;
+    }
+  }
+  return n ? {jp, n, ratio: jp/n} : null;
+}
+
+/* ── 한 장 처리 ── */
+/* 캔버스에서 픽셀을 읽는 건(getImageData) 한 번 한 번이 비싸다.
+   격자를 맞추는 동안 이걸 수만 번 부르면 폰에서는 사실상 멈춘 것처럼 보인다.
+   그래서 사진 전체를 딱 한 번만 읽어 두고, 그 뒤로는 메모리에서 잘라 쓴다. */
+function cachePixels(cv){
+  const W=cv.width, H=cv.height;
+  const all=cv.getContext('2d', {willReadFrequently:true}).getImageData(0,0,W,H).data;
+  /* 누적합 표(summed-area table). 격자를 맞추는 동안 같은 자리를 수만 번 평균 내는데,
+     그때마다 192×192 픽셀을 훑으면 한 장에 20억 번이 넘는다.
+     누적합을 한 번 만들어 두면 네 번 읽어 빼는 것으로 끝난다 — 값은 똑같다.
+     메모리를 크게 쓰므로 큰 사진이면 포기하고 예전 방식으로 돌아간다. */
+  let sat=null;
+  if(W*H <= 6e6){
+    try{
+      const w1=W+1, s=new Int32Array(w1*(H+1)*3);
+      for(let y=0;y<H;y++){
+        const row=(y+1)*w1*3, prev=y*w1*3;
+        let r=0,g=0,b=0;
+        for(let x=0;x<W;x++){
+          const i=(y*W+x)*4;
+          r+=all[i]; g+=all[i+1]; b+=all[i+2];
+          const o=row+(x+1)*3, p=prev+(x+1)*3;
+          s[o]=s[p]+r; s[o+1]=s[p+1]+g; s[o+2]=s[p+2]+b;
+        }
+      }
+      sat={ s, w1 };
+    }catch(e){ sat=null; }   // 메모리가 모자라면 조용히 예전 방식으로
+  }
+  return { W, H, sat, getImageData(x,y,w,h){
+    x|=0; y|=0; w|=0; h|=0;
+    const out=new Uint8ClampedArray(w*h*4);
+    for(let r=0;r<h;r++){
+      const sy=y+r; if(sy<0||sy>=H) continue;
+      let si=(sy*W+Math.max(x,0))*4, di=(r*w+Math.max(-x,0))*4;
+      const n=Math.min(w+Math.min(x,0), W-Math.max(x,0));
+      for(let k=0;k<n*4;k++) out[di+k]=all[si+k];
+    }
+    return { data:out, width:w, height:h };
+  }};
+}
+
+/* 카톡·메신저를 거치면서 줄어든 캡쳐는 카드가 100px 도 안 된다.
+   그러면 보구 숫자칸이 7×10px 밖에 안 남아 정렬이 조금만 어긋나도 통째로 오독한다.
+   실측: 전부 '보구5' 인 화면이 전부 '1' 로 읽혔다. 키워서 읽으면 32칸 전부 맞는다. */
+function upscale(cv, f){
+  const W=cv.width, H=cv.height, w2=Math.round(W*f), h2=Math.round(H*f);
+  const src=cv.getContext('2d',{willReadFrequently:true}).getImageData(0,0,W,H).data;
+  const dst=new Uint8ClampedArray(w2*h2*4);
+  for(let y=0;y<h2;y++){
+    const fy=Math.max(0,(y+0.5)/f-0.5), y0=Math.min(H-1,fy|0), y1=Math.min(H-1,y0+1), ty=fy-y0;
+    for(let x=0;x<w2;x++){
+      const fx=Math.max(0,(x+0.5)/f-0.5), x0=Math.min(W-1,fx|0), x1=Math.min(W-1,x0+1), tx=fx-x0;
+      const o=(y*w2+x)*4;
+      for(let k=0;k<3;k++){
+        const a=src[(y0*W+x0)*4+k], b=src[(y0*W+x1)*4+k],
+              c=src[(y1*W+x0)*4+k], d=src[(y1*W+x1)*4+k];
+        dst[o+k]=(a*(1-tx)+b*tx)*(1-ty) + (c*(1-tx)+d*tx)*ty;
+      }
+      dst[o+3]=255;
+    }
+  }
+  return { width:w2, height:h2, getContext(){ return { getImageData(x,y,w,h){
+    x|=0;y|=0;w|=0;h|=0; const out=new Uint8ClampedArray(w*h*4);
+    for(let r=0;r<h;r++){ const sy=y+r; if(sy<0||sy>=h2) continue;
+      for(let c=0;c<w;c++){ const sx=x+c; if(sx<0||sx>=w2) continue;
+        const si=(sy*w2+sx)*4, di=(r*w+c)*4;
+        out[di]=dst[si];out[di+1]=dst[si+1];out[di+2]=dst[si+2];out[di+3]=dst[si+3]; } }
+    return {data:out,width:w,height:h}; } }; } };
+}
+
+function scanShot(cv, wide, upped){
+  const G0=detectGrid(cv);
+  if(!G0) return { ok:false, reason:'격자를 찾지 못했습니다' };
+  if(!upped && G0.cw < 150){
+    const f = Math.min(3, Math.max(2, Math.round(250/G0.cw)));
+    if(cv.width*f * cv.height*f <= 30e6) return scanShot(upscale(cv,f), wide, true);
+  }
+  const ctx=cachePixels(cv);
+  const G=G0;
+  const H=G.H, S=REC.S, box=REC.box;
+  // 1단계 — 행 위상만 거칠게 잡는다 (여기서는 표본추출을 써도 무방)
+  const rowScore=(size,dx,yy,maxRows)=>{
+    let tot=0,k=0;
+    for(let y=yy; y+size<=H && k<maxRows; y+=G.per){
+      for(let c=0;c<G.ncol;c++){
+        const v=faceVec(ctx, G.x0+dx+c*G.pitch, y, size, size, S, box);
+        if(v) tot+=matchFace(v,4).s1;
+      }
+      k++;
+    }
+    return k? tot/k : -9;
+  };
+  const s0=G.cw-4; let yb=Math.round(H*0.12), bA=-9;
+  for(let y=Math.round(H*0.11); y<Math.round(H*0.11)+G.per; y+=3){
+    if(y+s0>H) break;
+    const t=rowScore(s0,4,y,3);
+    if(t>bA){ bA=t; yb=y; }
+  }
+  let size=s0, dx=4, y0=yb;
+
+  /* 2단계 — 칸마다 '가장 맞는 템플릿'을 먼저 고정하고, 그 템플릿 하나와의 NCC 로만
+     (크기·가로·세로)를 다시 맞춘다.
+     전체에서 1/4 만 추려 점수를 내면, 템플릿이 서번트당 재림 4개씩 붙어 있어서
+     서번트마다 같은 재림만 뽑히고 화면 카드가 다른 재림일 때 정렬돼도 점수가 오르지 않는다.
+     실측: 이 때문에 한 장에서 격자가 7~8px 어긋난 채로 수렴해 18칸 중 10칸을 놓쳤다. */
+  const REJ = REC.ids.map((v,i)=>v<0?i:-1).filter(i=>i>=0);   // 종화 등 '서번트 아님' 템플릿
+  const dot=(idx,v)=>{ const o=idx*REC.dim; let d=0; for(let j=0;j<REC.dim;j++) d+=REC.M[o+j]*v[j]; return d; };
+  for(let it=0; it<3; it++){
+    const locked=[]; let k=0;
+    for(let y=y0; y<H && k<3; y+=G.per){
+      const vh=Math.min(H,y+size)-y;
+      if(vh < size*0.45) break;
+      for(let c=0;c<G.ncol;c++){
+        const v=faceVec(ctx, G.x0+dx+c*G.pitch, y, size, vh, S, box);
+        if(!v) continue;
+        const m=matchFace(v);
+        if(m.s1>=0.30) locked.push({k, c, idx:m.idx});
+      }
+      k++;
+    }
+    if(!locked.length) break;
+    /* 칸마다 고정 템플릿과의 점수. 종화처럼 서번트가 아닌 카드로 화면이 꽉 차면
+       고정 템플릿이 전부 헛것이라 정렬이 무너지므로, '서번트 아님' 템플릿도 후보에 넣는다.
+       평균 대신 중앙값 — 몇 칸이 튀어도 정렬 기준이 흔들리지 않는다. */
+    const lscore=(sz,ddx,yy)=>{
+      const vals=[];
+      for(const L of locked){
+        const y=yy+L.k*G.per;
+        const vh=Math.min(H,y+sz)-y;
+        if(vh < sz*0.45) continue;
+        const v=faceVec(ctx, G.x0+ddx+L.c*G.pitch, y, sz, vh, S, box);
+        if(!v) continue;
+        let d=dot(L.idx, v);
+        for(const r of REJ){ const t=dot(r,v); if(t>d) d=t; }
+        vals.push(d);
+      }
+      if(!vals.length) return -9;
+      vals.sort((a,b)=>a-b);
+      return vals[vals.length>>1];
+    };
+    let best={sc:lscore(size,dx,y0), size, dx, y0};
+    /* 넓게 볼 때는 세로만 한 칸 통째로 훑어 대략적인 위치부터 잡는다.
+       크기·가로까지 한꺼번에 넓히면 경우의 수가 7배가 되어 폰에서 멈춘다. */
+    if(wide){
+      for(let dy=-(G.per>>1); dy<=(G.per>>1); dy+=4){
+        const y=y0+dy;
+        if(y<Math.round(H*0.08)) continue;
+        const t=lscore(size,dx,y);
+        if(t>best.sc) best={sc:t,size,dx,y0:y};
+      }
+      y0=best.y0;
+    }
+    for(let sz=G.cw-14; sz<=G.cw+8; sz+=3)
+      for(let ddx=-10; ddx<=16; ddx+=3)
+        for(let dy=-12; dy<=12; dy+=3){
+          const y=y0+dy;
+          if(y<Math.round(H*0.08)) continue;
+          const t=lscore(sz,ddx,y);
+          if(t>best.sc) best={sc:t,size:sz,dx:ddx,y0:y};
+        }
+    for(let sz=best.size-2; sz<=best.size+2; sz++)        // 1px 미세 조정
+      for(let ddx=best.dx-2; ddx<=best.dx+2; ddx++)
+        for(let dy=best.y0-2; dy<=best.y0+2; dy++){
+          if(dy<Math.round(H*0.08)) continue;
+          const t=lscore(sz,ddx,dy);
+          if(t>best.sc) best={sc:t,size:sz,dx:ddx,y0:dy};
+        }
+    size=best.size; dx=best.dx; y0=best.y0;
+  }
+
+  const out=[]; let cut=0, notSvt=0;
+  // 숫자 정렬은 앞쪽 여러 행을 함께 보고 한 번만 정한다
+  const tuneRows=[];
+  for(let y=y0; y<H && tuneRows.length<3; y+=G.per){
+    if(Math.min(H,y+size)-y >= size*0.20) tuneRows.push(y);
+  }
+  const dTune = tuneRows.length ? tuneDigits(ctx, G, size, dx, tuneRows, G.ncol) : {conf:-1,ox:0,oy:0,sc:1};
+  for(let y=y0; y<H; y+=G.per){
+    const vish=Math.min(H,y+size)-y;
+    if(vish/size < 0.45){ cut++; continue; }   // 너무 잘린 행 — 조용히 버리지 않고 센다
+    // 보구Lv 는 카드 위쪽(0.05~0.165)이라 아래가 잘려도 숫자는 남는다.
+    // 정렬 자체가 형편없으면 숫자를 읽지 않는다 (엉뚱한 값을 넣느니 기존 값을 유지)
+    // 행 간격이 미세하게 어긋나 아래로 갈수록 숫자칸이 밀린다. 행마다 세로만 다시 맞춘다.
+    let npCells = null;
+    if(vish >= size*0.20 && dTune.conf >= 0.40){
+      let bestM=-1;
+      // 세로만 맞추면 오른쪽 열로 갈수록 가로가 밀린다(실측: 오독 20건 중 13건이 우측 열).
+      const RX = Math.max(1, Math.round(size*0.011));   // 카드 192px → ±2
+      const RY = Math.max(2, Math.round(size*0.026));   // 카드 192px → ±5
+      for(let dxo=-RX; dxo<=RX; dxo++)
+      for(let d=-RY; d<=RY; d++){
+        const r = readRowNP(ctx, G, size, dx, y, G.ncol, {...dTune, ox:dTune.ox+dxo, oy:dTune.oy+d});
+        const m = r.reduce((a,z)=>a+z.conf,0)/r.length;
+        if(m>bestM){ bestM=m; npCells=r; }
+      }
+      // 이 행 자체가 흐리면(상단 UI에 가림 등) 숫자를 쓰지 않는다.
+      if(bestM < 0.40) npCells = null;
+    }
+    for(let c=0;c<G.ncol;c++){
+      const x=G.x0+dx+c*G.pitch;
+      if(x+size>cv.width) continue;
+      if(cardPresence(ctx,x,y,size,vish) < REC_TH.card) continue;
+      const v=faceVec(ctx,x,y,size,vish,S,box);
+      if(!v) continue;
+      const m=matchFace(v);
+      if(m.id < 0){ notSvt++; continue; }   // Exp.UP 등 서번트가 아닌 카드
+      const np=(npCells && npCells[c]) ? npCells[c] : {np:0,conf:0};
+      out.push({ ...m, np:np.np, npConf:np.conf, x, y, size, vis:vish/size });
+    }
+  }
+  fixNPSpikes(out);
+  const lang = readServer(ctx, G, size, dx, tuneRows, dTune);
+  return { ok:true, cells:out, cut, notSvt, grid:{...G,size,dx,y0}, dTune, lang };
+}
+
+/* 영기일람은 보구Lv 순으로 정렬돼 있다(오름/내림 무관).
+   그래서 읽은 숫자도 한 방향으로 흘러야 하고, 혼자 튀는 값은 오독이다.
+   양옆이 같은데 가운데만 다르면 양옆 값으로 고친다. */
+function fixNPSpikes(cells){
+  const a=cells.filter(c=>c.np>0);
+  if(a.length<5) return;
+  let asc=0, desc=0;
+  for(let i=1;i<a.length;i++){ if(a[i].np>a[i-1].np) asc++; else if(a[i].np<a[i-1].np) desc++; }
+  // 보구순으로 정렬된 화면만 손댄다. 한 방향이 압도적이어야 한다.
+  // (예전 조건 max(asc,desc) >= 5% 는 사실상 항상 참이라, 정렬 안 된 화면에서
+  //  멀쩡한 값을 장당 평균 3칸씩 망가뜨릴 수 있었다.)
+  // 뒤섞인 화면은 손대지 않는다. 정렬 안 된 목록이면 오르내림이 반반이라 이 문턱을 넘는다.
+  if(Math.min(asc,desc) > Math.max(2, a.length*0.2)) return;
+  /* 1차 — 앞뒤 2칸씩(총 5칸)의 중앙값. 혼자 튀는 칸, 특히 맨 앞뒤를 잡는다.
+     원본을 따로 두고 읽어야 고친 값이 다음 칸 판단에 섞이지 않는다. */
+  {
+    const base=a.map(c=>c.np);
+    for(let i=0;i<a.length;i++){
+      if(a[i].npConf >= 0.85) continue;               // 확신이 아주 높으면 건드리지 않는다
+      const w=base.slice(Math.max(0,i-2), Math.min(base.length,i+3)).sort((x,y)=>x-y);
+      const m=w[w.length>>1];
+      if(m!==a[i].np){ a[i].np=m; a[i].npFixed=true; }
+    }
+  }
+  /* 2차 — 영기일람을 보구Lv 순으로 정렬해 두면 값이 한 방향으로만 간다.
+     그 순서를 반드시 지키는 값들 중, 원래 읽은 값과 가장 적게 어긋나는 조합을 고른다.
+     (어긋남의 무게 = 그 칸을 읽을 때의 확신도. 흐리게 읽은 칸부터 굽는다.)
+     중앙값 보정은 확신 있게 틀린 칸을 못 고쳤다 — 실측에서 한 줄에 4칸이 남았다. */
+  let asc2=0, desc2=0;
+  for(let i=1;i<a.length;i++){ if(a[i].np>a[i-1].np) asc2++; else if(a[i].np<a[i-1].np) desc2++; }
+  if(Math.min(asc2,desc2) > 1) return;                // 1차 후에도 뒤섞였으면 정렬된 화면이 아니다
+  const n=a.length, V=5, down = desc2>=asc2;
+  const cost=(i,v)=> a[i].np===v ? 0 : Math.max(a[i].npConf, 0.05);
+  const dp=[], bk=[];
+  for(let i=0;i<n;i++){ dp.push(new Float64Array(V+1).fill(Infinity)); bk.push(new Int8Array(V+1)); }
+  for(let v=1;v<=V;v++) dp[0][v]=cost(0,v);
+  for(let i=1;i<n;i++)
+    for(let v=1;v<=V;v++){
+      let best=Infinity, arg=v;
+      // 내림차순이면 앞 칸이 나보다 크거나 같아야 한다 (오름차순이면 반대)
+      for(let p=1;p<=V;p++){
+        if(down ? p<v : p>v) continue;
+        if(dp[i-1][p]<best){ best=dp[i-1][p]; arg=p; }
+      }
+      dp[i][v]=best+cost(i,v); bk[i][v]=arg;
+    }
+  let v=1; for(let u=2;u<=V;u++) if(dp[n-1][u]<dp[n-1][v]) v=u;
+  const fit=new Array(n);
+  for(let i=n-1;i>=0;i--){ fit[i]=v; v=bk[i][v]||v; }
+  for(let i=0;i<n;i++) if(fit[i]!==a[i].np){ a[i].np=fit[i]; a[i].npFixed=true; }
+}
+
+/* ── 진입점 ── */
+async function recognizeShots(files){
+  const ov=document.getElementById('recOv'); ov.classList.add('open');
+  const st=document.getElementById('recSt');
+  st.textContent=`인식 엔진 ${REC_VER} — 모델을 받는 중…`;
+  try{
+  try{ await loadRecModel(); }
+  catch(e){ ov.classList.remove('open'); alert('인식 모델을 받지 못했습니다. 잠시 뒤 다시 시도해 주세요.'); return; }
+
+  const found = new Map();     // svtId -> {np, s1, gap}
+  let cutRows = 0, notSvtTotal = 0;
+  const weak  = [];
+  let bad=0, jpByLabel=0;
+  for(let i=0;i<files.length;i++){
+    st.textContent = `캡쳐 ${i+1}/${files.length} 분석 중…`;
+    await new Promise(r=>setTimeout(r,10));
+    let cv;
+    try{ cv = toCanvas(await loadImg(files[i])); }catch(e){ bad++; continue; }
+    let r = scanShot(cv);
+    const okOf = x => x && x.cells ? x.cells.filter(isSure).length : -1;
+    // 종화(Exp.UP)가 화면을 채우면 기준점을 잡을 데가 없어 정렬이 한 칸씩 밀린다.
+    // 결과가 나쁠 때만 세로 탐색을 한 칸 통째로 넓혀 다시 시도한다 (평소엔 느려지지 않게).
+    if(r.ok && r.cells.length && okOf(r) < r.cells.length*0.5){
+      const r2 = scanShot(cv, true);
+      if(r2.ok && okOf(r2) > okOf(r)) r = r2;
+    }
+    if(!r.ok){ bad++; continue; }
+    const okCnt = r.cells.filter(isSure).length;
+    if(r.cells.length && okCnt < r.cells.length*0.5){ bad++; continue; }
+    cutRows += r.cut||0; notSvtTotal += r.notSvt||0;
+    if(r.lang && r.lang.ratio >= 0.70) jpByLabel++;      // 글자로 본 일본 캡쳐
+    /* 한 장 안에서 같은 서번트가 여러 칸에 나오면 '진짜로 여러 장 보유'다.
+       보구는 합쳐진 장수이므로 보구를 더한다 (보1 + 보1 = 보2).
+       캡쳐끼리는 겹쳐 찍힐 수 있으니 더하지 않는다. 대신 '가장 선명하게 읽힌 장'을 쓴다.
+       (큰 쪽을 쓰면 어느 한 장의 오독이 영구히 눌러앉는다 — 실측으로 확인됨) */
+    const perShot = new Map();
+    r.cells.forEach(c => {
+      if(isSure(c)){
+        const d = perShot.get(c.id) || {sum:0, conf:1, s1:0, gap:0};
+        d.sum += (c.np > 0 ? c.np : 1);   // 보유는 확실, 숫자만 못 읽으면 최소 1장
+        d.conf = Math.min(d.conf, c.np>0 ? c.npConf : 0);   // 가장 흐린 칸이 그 장의 신뢰도
+        if(c.s1 > d.s1){ d.s1=c.s1; d.gap=c.gap; }
+        perShot.set(c.id, d);
+      } else weak.push(c);
+    });
+    perShot.forEach((d,id) => {
+      const cur = found.get(id);
+      if(!cur || d.conf > cur.conf || (d.conf === cur.conf && d.sum > cur.sum)) found.set(id, d);
+    });
+  }
+  // 확신 없던 칸도 다른 장에서 확정됐으면 살린다
+  const rescued = weak.filter(c => found.has(c.id)).length;
+  const left    = weak.filter(c => !found.has(c.id));
+
+  /* 어느 서버 캡쳐인지 정한다. 근거는 두 가지고, 둘 다 한 방향으로만 확실하다.
+     ① 글자('宝具Lv.')가 일본  ② 한국 미출시 서번트가 나옴 — 한국서버엔 있을 수 없다.
+     반대 방향(일본→한국)은 자동으로 되돌리지 않는다. '한국 서번트만 나왔다'는 근거가 못 된다.
+     사용자가 직접 고른 뒤에는 건드리지 않는다. */
+  const jpBySvt = [...found.keys()].some(id => { const s=svtById.get(id); return s && s.rarity===5 && s.kr===0; });
+  let srvAuto = null;
+  if(!srvManual && srv !== 'JP' && (jpByLabel || jpBySvt)){ srvAuto = 'JP'; setSrv('JP', false); }
+
+  let added=0, upd=0;
+  let lowRarity = 0, noNP = 0, welfare = 0;
+  found.forEach((v,id) => {
+    // 전 레어도로 대조해야 ★4가 엉뚱한 ★5로 붙는 걸 막는다. 다만 저장은 ★5만 한다.
+    const sv = svtById.get(id) || {};
+    if(sv.rarity !== 5){ lowRarity++; return; }
+    // 배포는 확챠에 안 나온다. own 에 넣으면 목록에 없어 지울 수도 없는 유령이 된다.
+    if(WELFARE_NO.has(sv.no)){ welfare++; return; }
+    const pick = Math.min(5, v.sum);    // 보유 장수의 합, 보구5가 상한
+    if(!pick){
+      if(!own[id]){ own[id]=1; added++; noNP++; }
+      return;
+    }
+    if(!own[id]) added++; else if(own[id] !== pick) upd++;
+    own[id] = pick;                    // 이번에 본 값으로 덮어쓴다 (다시 올리면 고쳐진다)
+  });
+  persist(); renderSvt(); renderBags(); updFoot();
+  const msg = [
+    `[${REC_VER}]`,
+    `캡쳐 ${files.length}장에서 ★5 ${found.size-lowRarity}기를 찾았습니다.`,
+    `  새로 추가 ${added}기 · 보구레벨 갱신 ${upd}기`,
+    notSvtTotal ? `  서번트가 아닌 카드 ${notSvtTotal}칸 제외 (Exp.UP 등)` : '',
+    noNP ? `  보구레벨을 못 읽어 1로 둔 서번트 ${noNP}기 — 직접 확인해 주세요` : '',
+    lowRarity ? `  (★4 이하 ${lowRarity}기는 복주머니 대상이 아니라 제외)` : '',
+    welfare ? `  배포 서번트 ${welfare}기 제외 (확챠에 나오지 않습니다)` : '',
+    srvAuto ? `  일본 서버 캡쳐로 판단했습니다 — 기준을 일본으로 바꿨습니다 (아래에서 직접 바꿀 수 있습니다)` : '',
+    rescued ? `  애매했지만 다른 캡쳐로 확인된 칸 ${rescued}개` : '',
+    left.length ? `  끝내 확인 못 한 칸 ${left.length}개 — 직접 눌러주세요` : '',
+    `\n보구레벨 분포  ${[1,2,3,4,5].map(k=>k+':'+[...found.entries()].filter(([id,v])=>(svtById.get(id)||{}).rarity===5 && (v.np||1)===k).length).join('  ')}`,
+    cutRows ? `\n너무 잘려서 건너뛴 줄 ${cutRows}개 — 그 줄이 온전히 나오게 한 장 더 찍어주세요` : '',
+    bad ? `\n인식하지 못한 캡쳐 ${bad}장 (영기일람 화면 전체가 나오게 다시 찍어주세요)` : '',
+  ].filter(Boolean).join('\n');
+  alert(msg + '\n\n' + statText());
+  toast(`${found.size}기 인식 완료`);
+  }catch(e){
+    alert('인식 중 문제가 생겼습니다.\n' + (e && e.message ? e.message : e));
+  }finally{
+    ov.classList.remove('open');     // 어떤 경우에도 진행 화면은 닫는다
+  }
+}
+
+/* ══════════ UTIL ══════════ */
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+let tmr;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(tmr); tmr = setTimeout(()=>t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>
