@@ -282,10 +282,9 @@ function renderSlots(){
     el.textContent = '';
     const img = document.createElement('img');
     img.src = FACE(s[0]);
-    img.alt = s[2];
+    img.alt = '';
     img.crossOrigin = 'anonymous';
     el.appendChild(img);
-    el.title = `${i + 1}. ${s[2]} (★${s[3]})`;
   });
 }
 
@@ -305,7 +304,7 @@ function renderPick(){
   p.innerHTML = '';
   const img = document.createElement('img');
   img.src = FACE(s[0]);
-  img.alt = s[2];
+  img.alt = '';
   img.crossOrigin = 'anonymous';
   p.appendChild(img);
 }
@@ -317,11 +316,9 @@ function place(slotIdx){
   if (placed[slotIdx]) { sb(`${slotIdx + 1}번은 이미 찼습니다.`); return false; }
   if (!placed.some(Boolean)) lockFilter();
   placed[slotIdx] = queue[qi];
-  const name = queue[qi][2];
   qi++;
   renderSlots();
   renderPick();
-  if (qi < queue.length) sb(`${slotIdx + 1}번 = ${name} · 남은 ${queue.length - qi}명`);
   return true;
 }
 
