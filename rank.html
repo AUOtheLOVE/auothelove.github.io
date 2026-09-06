@@ -165,7 +165,7 @@ a.btn{display:inline-block;text-decoration:none;vertical-align:middle}
     <button class="btn" data-g="1" onclick="setFilter(1)">남캐</button>
     <button class="btn" data-g="2" onclick="setFilter(2)">여캐</button>
   </span>
-  <button class="btn save" id="btnPng" onclick="exportPNG()" style="margin-left:auto" disabled><span class="lg">PNG 저장</span><span class="sm">PNG</span></button>
+  <button class="btn save" id="btnPng" onclick="exportPNG()" style="margin-left:auto"><span class="lg">PNG 저장</span><span class="sm">PNG</span></button>
 </div>
 
 <div class="scroll" id="scroll">
@@ -306,7 +306,6 @@ function renderPick(){
     p.hidden = true;                 // 다 넣으면 카드 자체를 없앤다
     p.classList.remove('armed');
     p.innerHTML = '';
-    $('btnPng').disabled = false;
     sb('완료 ✓ 10명 다 넣었습니다. PNG로 저장하세요. (다시 하려면 새로고침)');
     return;
   }
@@ -476,9 +475,7 @@ window.addEventListener('paste', e => {
 async function exportPNG(){
   sb('PNG 생성 중…');
   const armedWas = armed;
-  armed = false; $('pick').classList.remove('armed');
-  const pickWasHidden = $('pick').hidden;
-  $('pick').hidden = true;              // 완료 카드는 결과물에서 뺀다
+  armed = false; $('pick').classList.remove('armed');   // 선택 테두리만 뺀다
   try {
     // 외부 CDN 이미지를 dataURL로 바꿔야 canvas가 오염되지 않음
     const imgs = stage.querySelectorAll('img');
@@ -507,7 +504,6 @@ async function exportPNG(){
   } catch(e) {
     sb('오류: ' + e.message);
   } finally {
-    $('pick').hidden = pickWasHidden;
     armed = armedWas;
     if (armed) $('pick').classList.add('armed');
   }
