@@ -154,7 +154,7 @@ a.btn{display:inline-block;text-decoration:none;vertical-align:middle}
 <div class="topbar">
   <h1>FGO <span>순위 매기기</span></h1>
   <a class="btn" href="./" title="FGO 이것저것">Home</a>
-  <button class="btn" onclick="pickFile()">이미지 올리기</button>
+  <button class="btn" onclick="pickFile()">배경 올리기</button>
   <input type="file" id="file" accept="image/*" hidden onchange="onFile(this.files[0]); this.value='';"/>
   <span class="seg" id="seg">
     <button class="btn on" data-g="0" onclick="setFilter(0)">모두</button>
@@ -168,7 +168,7 @@ a.btn{display:inline-block;text-decoration:none;vertical-align:middle}
   <div id="stage">
     <div id="bgEmpty" onclick="pickFile()" role="button" tabindex="0">
       <div style="font-size:30px;line-height:1">🖼</div>
-      <div>눌러서 이미지 올리기</div>
+      <div>눌러서 배경 이미지 올리기</div>
       <div style="font-size:11px;color:var(--t3)">끌어다 놓기 · Ctrl+V 도 됩니다</div>
     </div>
     <img id="bgImg" alt="" hidden/>
@@ -364,7 +364,6 @@ $('pick').addEventListener('pointerup', e => {
     // 안 옮겼으면 = 그냥 누른 것 → 찍어서 넣기 모드
     armed = !armed;
     $('pick').classList.toggle('armed', armed);
-    if (armed) sb('넣을 순번을 누르세요. (다시 카드를 누르면 취소)');
   }
 });
 
