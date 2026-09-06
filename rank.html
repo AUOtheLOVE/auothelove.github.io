@@ -118,10 +118,6 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
 .pick:active{cursor:grabbing}
 .pick.armed{border-color:var(--acc);box-shadow:0 0 0 4px rgba(154,124,46,.35),0 3px 12px rgba(0,0,0,.3)}
 .pick img{display:block;width:100%;height:auto;pointer-events:none}
-.pick.done{
-  cursor:default;padding:16px 10px;text-align:center;
-  font-size:13px;font-weight:700;color:var(--acc2);background:#fff;
-}
 
 /* 끌기 중 따라다니는 유령 */
 #ghost{
@@ -297,17 +293,15 @@ function renderSlots(){
 function renderPick(){
   const p = $('pick');
   if (qi >= queue.length) {
-    p.hidden = false;
+    p.hidden = true;                 // 다 넣으면 카드 자체를 없앤다
     p.classList.remove('armed');
-    p.classList.add('done');
-    p.innerHTML = '완료 ✓<br/><span style="font-weight:500;font-size:11px;color:#6b6660">새로 하려면 새로고침</span>';
+    p.innerHTML = '';
     $('btnPng').disabled = false;
-    sb('10명 다 넣었습니다. PNG로 저장하세요. (다시 하려면 새로고침 — 캐릭터는 새로 뽑힙니다)');
+    sb('완료 ✓ 10명 다 넣었습니다. PNG로 저장하세요. (다시 하려면 새로고침)');
     return;
   }
   const s = queue[qi];
   p.hidden = false;
-  p.classList.remove('done');
   p.innerHTML = '';
   const img = document.createElement('img');
   img.src = FACE(s[0]);
