@@ -81,11 +81,13 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
 #stage.short #bgImg{width:100%;height:100%;object-fit:contain}
 
 #bgEmpty{
+  cursor:pointer;
   aspect-ratio:3/4;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:12px;
   color:var(--t3);font-size:13px;text-align:center;padding:24px 24px 24px 22%;
   background:repeating-linear-gradient(45deg,#fbfaf7,#fbfaf7 10px,#f4f1ec 10px,#f4f1ec 20px);
 }
+#bgEmpty:hover{background:repeating-linear-gradient(45deg,#f8f6f1,#f8f6f1 10px,#efebe4 10px,#efebe4 20px)}
 
 /* 좌측 순번 줄 — 칸은 항상 정사각형, 서로 딱 붙는다. 크기는 JS가 무대에 맞춰 잡는다 */
 .slots{
@@ -136,9 +138,18 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
 .statusbar .note::before{content:'·';margin:0 7px;color:var(--line)}
 .statusbar .note b{color:var(--t2);font-weight:600}
 
-@media (max-width:520px){
-  .topbar{padding:8px 10px;gap:7px}
-  .scroll{padding:12px 8px 30px}
+/* 버튼 라벨: 넓을 땐 긴 이름, 좁을 땐 짧은 이름 */
+.btn .sm{display:none}
+
+@media (max-width:560px){
+  .topbar{padding:7px 8px;gap:5px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .topbar::-webkit-scrollbar{display:none}
+  .topbar h1{display:none}
+  .btn{padding:5px 9px;font-size:11.5px;flex-shrink:0}
+  a.btn{line-height:16px}
+  .btn .lg{display:none}
+  .btn .sm{display:inline}
+  .scroll{padding:10px 8px 14px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -148,21 +159,22 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
 <div class="topbar">
   <h1>FGO <span>순위 매기기</span></h1>
   <a class="btn" href="./" title="FGO 이것저것">Home</a>
-  <button class="btn" onclick="document.getElementById('file').click()">이미지 올리기</button>
-  <input type="file" id="file" accept="image/png,image/jpeg,image/webp" hidden onchange="onFile(this.files[0])"/>
+  <button class="btn" onclick="pickFile()"><span class="lg">이미지 올리기</span><span class="sm">이미지</span></button>
+  <input type="file" id="file" accept="image/*" hidden onchange="onFile(this.files[0]); this.value='';"/>
   <span class="seg" id="seg">
     <button class="btn on" data-g="0" onclick="setFilter(0)">모두</button>
     <button class="btn" data-g="1" onclick="setFilter(1)">남캐</button>
     <button class="btn" data-g="2" onclick="setFilter(2)">여캐</button>
   </span>
-  <button class="btn save" id="btnPng" onclick="exportPNG()" style="margin-left:auto" disabled>PNG 저장</button>
+  <button class="btn save" id="btnPng" onclick="exportPNG()" style="margin-left:auto" disabled><span class="lg">PNG 저장</span><span class="sm">PNG</span></button>
 </div>
 
 <div class="scroll" id="scroll">
   <div id="stage">
-    <div id="bgEmpty">
+    <div id="bgEmpty" onclick="pickFile()" role="button" tabindex="0">
       <div style="font-size:30px;line-height:1">🖼</div>
-      <div>이미지 끌어올리기 <span style="color:var(--t3)">(Ctrl+V 가능)</span></div>
+      <div>눌러서 이미지 올리기</div>
+      <div style="font-size:11px;color:var(--t3)">끌어다 놓기 · Ctrl+V 도 됩니다</div>
     </div>
     <img id="bgImg" alt="" hidden/>
     <div class="slots" id="slots"></div>
@@ -393,6 +405,8 @@ function hot(el){
 }
 
 /* ═══ 배경 이미지 ═══ */
+function pickFile(){ $('file').click(); }
+
 function onFile(f){
   if (!f) return;
   if (!/^image\//.test(f.type)) { sb('이미지 파일만 됩니다.'); return; }
@@ -500,6 +514,7 @@ async function exportPNG(){
   }
 }
 
+window.pickFile = pickFile;
 window.setFilter = setFilter;
 window.onFile = onFile;
 window.exportPNG = exportPNG;
