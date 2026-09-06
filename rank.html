@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>순위 매기기</title>
 <meta name="theme-color" content="#f7f5f0"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 [hidden]{display:none!important}   /* display:flex 가 UA의 [hidden] 을 이겨서 생기는 겹침 방지 */
@@ -289,9 +288,9 @@ function renderSlots(){
     if (!s) { el.textContent = String(i + 1); el.removeAttribute('title'); return; }
     el.textContent = '';
     const img = document.createElement('img');
+    img.crossOrigin = 'anonymous';   // src 대입 전에 걸어야 CORS 로 받는다
     img.src = FACE(s[0]);
     img.alt = '';
-    img.crossOrigin = 'anonymous';
     el.appendChild(img);
   });
 }
@@ -310,9 +309,9 @@ function renderPick(){
   p.hidden = false;
   p.innerHTML = '';
   const img = document.createElement('img');
+  img.crossOrigin = 'anonymous';   // src 대입 전에 걸어야 CORS 로 받는다
   img.src = FACE(s[0]);
   img.alt = '';
-  img.crossOrigin = 'anonymous';
   p.appendChild(img);
 }
 
@@ -468,36 +467,98 @@ window.addEventListener('paste', e => {
   if (it) onFile(it.getAsFile());
 });
 
-/* ═══ PNG 저장 ═══ */
-async function exportPNG(){
-  sb('PNG 생성 중…');
+/* ═══ PNG 저장 ═══
+   html2canvas 는 DOM 을 통째로 복제해 1초 이상 걸렸고 scale>1 에서 transform 을
+   잘못 그렸다. 무대 구성이 (배경 1장 + 정사각 칸 11개)뿐이라 캔버스에 직접 그린다. */
+function roundPath(g, x, y, w, h, r){
+  if (g.roundRect) { g.beginPath(); g.roundRect(x, y, w, h, r); return; }
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w, y, x + w, y + h, r);
+  g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r);
+  g.arcTo(x, y, x + w, y, r);
+  g.closePath();
+}
+
+function renderCanvas(){
+  const st = $('stage'), sr = st.getBoundingClientRect();
+  const im = $('bgImg');
+  const hasBg = !im.hidden && im.naturalWidth > 0;
+  const OW = Math.round(hasBg ? Math.min(1400, Math.max(900, im.naturalWidth)) : 1100);
+  const k  = OW / sr.width;
+  const OH = Math.round(sr.height * k);
+
+  const cv = document.createElement('canvas');
+  cv.width = OW; cv.height = OH;
+  const g = cv.getContext('2d');
+  g.fillStyle = '#ffffff'; g.fillRect(0, 0, OW, OH);
+
+  if (hasBg) {
+    if (st.classList.contains('short')) {           // 가로 그림은 액자에 넣어 통째로
+      g.fillStyle = '#20242b'; g.fillRect(0, 0, OW, OH);
+      const s = Math.min(OW / im.naturalWidth, OH / im.naturalHeight);
+      const w = im.naturalWidth * s, h = im.naturalHeight * s;
+      g.drawImage(im, (OW - w) / 2, (OH - h) / 2, w, h);
+    } else {
+      g.drawImage(im, 0, 0, OW, OH);
+    }
+  }
+
+  const drawBox = (el, isPick) => {
+    if (el.hidden) return;
+    const r = el.getBoundingClientRect();
+    const X = (r.left - sr.left) * k, Y = (r.top - sr.top) * k;
+    const W = r.width * k, H = r.height * k;
+    const cs = getComputedStyle(el);
+    const bw  = parseFloat(cs.borderTopWidth) * k;
+    const rad = parseFloat(cs.borderTopLeftRadius) * k;
+
+    roundPath(g, X, Y, W, H, rad); g.fillStyle = '#ffffff'; g.fill();
+
+    const img = el.querySelector('img');
+    if (img && img.naturalWidth) {
+      g.save();
+      roundPath(g, X + bw, Y + bw, W - 2*bw, H - 2*bw, Math.max(0, rad - bw));
+      g.clip();
+      const iw = W - 2*bw, ih = H - 2*bw;
+      const s = Math.max(iw / img.naturalWidth, ih / img.naturalHeight);   // cover
+      const dw = img.naturalWidth * s, dh = img.naturalHeight * s;
+      g.drawImage(img, X + bw + (iw - dw) / 2, Y + bw + (ih - dh) / 2, dw, dh);
+      g.restore();
+    } else if (!isPick) {
+      g.fillStyle = '#111'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.font = `800 ${parseFloat(cs.fontSize) * k}px ${cs.fontFamily}`;
+      g.fillText(el.textContent.trim(), X + W / 2, Y + H / 2);
+    }
+
+    roundPath(g, X + bw/2, Y + bw/2, W - bw, H - bw, Math.max(0, rad - bw/2));
+    g.lineWidth = bw; g.strokeStyle = '#111'; g.stroke();
+  };
+
+  [...$('slots').children].forEach(el => drawBox(el, false));
+  drawBox($('pick'), true);
+  return cv;
+}
+
+function exportPNG(){
+  sb('PNG 만드는 중…');
   const armedWas = armed;
-  armed = false; $('pick').classList.remove('armed');   // 선택 테두리만 뺀다
+  armed = false; $('pick').classList.remove('armed');   // 선택 테두리는 결과물에서 뺀다
   try {
-    // 외부 CDN 이미지를 dataURL로 바꿔야 canvas가 오염되지 않음
-    const imgs = stage.querySelectorAll('img');
-    await Promise.allSettled([...imgs].map(async im => {
-      if (!im.src || im.src.startsWith('data:')) return;
-      try {
-        const r = await fetch(im.src, {mode:'cors'});
-        const blob = await r.blob();
-        im.src = await new Promise((res, rej) => {
-          const fr = new FileReader();
-          fr.onload = () => res(fr.result); fr.onerror = rej;
-          fr.readAsDataURL(blob);
-        });
-      } catch(err) {}
-    }));
-    const canvas = await html2canvas(stage, {
-      backgroundColor:'#ffffff', scale:2, useCORS:true, allowTaint:false, logging:false
-    });
+    const cv = renderCanvas();
     const d = new Date();
-    const pad = n => String(n).padStart(2,'0');
-    const a = document.createElement('a');
-    a.download = `FGO_순위_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.png`;
-    a.href = canvas.toDataURL('image/png');
-    a.click();
-    sb('PNG 저장 완료 ✓');
+    const pad = n => String(n).padStart(2, '0');
+    const name = `FGO_순위_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.png`;
+    cv.toBlob(blob => {
+      if (!blob) { sb('오류: 이미지를 만들지 못했습니다.'); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.download = name; a.href = url;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      sb('PNG 저장 완료 ✓');
+    }, 'image/png');
   } catch(e) {
     sb('오류: ' + e.message);
   } finally {
