@@ -54,6 +54,12 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
 .btn:disabled:hover{background:var(--s2);border-color:var(--line)}
 .btn.save{border-color:var(--acc);color:var(--acc)}
 .btn.save:hover:not(:disabled){background:var(--acc);color:#fff}
+.btn.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btn.on:hover:not(:disabled){background:var(--acc2);border-color:var(--acc2)}
+.seg{display:inline-flex;gap:0}
+.seg .btn{border-radius:0;margin-left:-1px}
+.seg .btn:first-child{border-radius:4px 0 0 4px;margin-left:0}
+.seg .btn:last-child{border-radius:0 4px 4px 0}
 
 /* ── 무대 ── */
 .scroll{
@@ -135,6 +141,11 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
   flex-shrink:0;background:var(--s1);border-top:1px solid var(--line);
   padding:6px 16px;font-size:11.5px;color:var(--t2);
 }
+.notebar{
+  flex-shrink:0;background:var(--s2);border-top:1px solid var(--line);
+  padding:5px 16px;font-size:11px;color:var(--t3);line-height:1.5;
+}
+.notebar b{color:var(--t2);font-weight:600}
 
 @media (max-width:520px){
   .topbar{padding:8px 10px;gap:7px}
@@ -150,6 +161,11 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
   <a class="btn" href="./" title="FGO 이것저것">Home</a>
   <button class="btn" onclick="document.getElementById('file').click()">이미지 올리기</button>
   <input type="file" id="file" accept="image/png,image/jpeg,image/webp" hidden onchange="onFile(this.files[0])"/>
+  <span class="seg" id="seg">
+    <button class="btn on" data-g="0" onclick="setFilter(0)">모두</button>
+    <button class="btn" data-g="1" onclick="setFilter(1)">남캐</button>
+    <button class="btn" data-g="2" onclick="setFilter(2)">여캐</button>
+  </span>
   <button class="btn save" id="btnPng" onclick="exportPNG()" style="margin-left:auto" disabled>PNG 저장</button>
 </div>
 
@@ -166,6 +182,7 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
 </div>
 
 <div class="statusbar" id="sb">준비</div>
+<div class="notebar">남캐 · 여캐 버튼은 <b>염마정(참새 여관 활동일지)</b>의 남탕 · 여탕 출격 기준입니다. 양쪽 다 되는 서번트는 두 목록에 모두 나옵니다.</div>
 
 <script>
 'use strict';
@@ -180,6 +197,7 @@ let POOL = [];          // svt.json 전체
 let queue = [];         // 이번 판 10기
 let qi = 0;             // 지금 내밀고 있는 순번
 let placed = new Array(N_SLOT).fill(null);
+let filter = 0;          // 0=모두 1=남캐 2=여캐 (svt.json 7번째 칸 비트)
 
 const $ = id => document.getElementById(id);
 const sb = t => { $('sb').textContent = t; };
@@ -190,7 +208,7 @@ const sb = t => { $('sb').textContent = t; };
   fit();
   restore();
   try {
-    const r = await fetch('data/svt.json?v=1', {cache:'no-store'});
+    const r = await fetch('data/svt.json?v=2', {cache:'no-store'});
     POOL = await r.json();
   } catch(e) {
     sb('서번트 목록을 불러오지 못했습니다: ' + e.message);
@@ -201,7 +219,7 @@ const sb = t => { $('sb').textContent = t; };
 
 /* 랜덤 10기 (전체 풀에서, 중복 없음) */
 function roll(){
-  const a = POOL.slice();
+  const a = POOL.filter(r => filter === 0 || ((r[6] || 0) & filter));
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
@@ -209,9 +227,23 @@ function roll(){
   queue = a.slice(0, N_SLOT);
   qi = 0;
   placed = new Array(N_SLOT).fill(null);
+  [...$('seg').children].forEach(b => { b.disabled = false; });
   renderSlots();
   renderPick();
-  sb(`전체 ${POOL.length}기(JP) 중 랜덤 ${N_SLOT}기. 순위로 드래그 하면 됩니다.`);
+  const label = filter === 1 ? '남캐' : filter === 2 ? '여캐' : '전체';
+  sb(`${label} ${a.length}기(JP) 중 랜덤 ${N_SLOT}기. 순위로 드래그 하면 됩니다.`);
+}
+
+/* 필터 전환 — 배치를 시작하기 전에만 바꿀 수 있다 */
+function setFilter(g){
+  if (g === filter) return;
+  if (placed.some(Boolean)) { sb('이미 배치를 시작해서 못 바꿉니다. 새로고침하세요.'); return; }
+  filter = g;
+  [...$('seg').children].forEach(b => b.classList.toggle('on', +b.dataset.g === g));
+  roll();
+}
+function lockFilter(){
+  [...$('seg').children].forEach(b => { b.disabled = true; });
 }
 
 /* ═══ 슬롯 ═══ */
@@ -301,6 +333,7 @@ function place(slotIdx){
   if (qi >= queue.length) return false;
   if (slotIdx == null || slotIdx < 0 || slotIdx >= N_SLOT) return false;
   if (placed[slotIdx]) { sb(`${slotIdx + 1}번은 이미 찼습니다.`); return false; }
+  if (!placed.some(Boolean)) lockFilter();
   placed[slotIdx] = queue[qi];
   const name = queue[qi][2];
   qi++;
@@ -488,6 +521,7 @@ async function exportPNG(){
   }
 }
 
+window.setFilter = setFilter;
 window.onFile = onFile;
 window.exportPNG = exportPNG;
 </script>
