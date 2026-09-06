@@ -118,11 +118,6 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
 .pick:active{cursor:grabbing}
 .pick.armed{border-color:var(--acc);box-shadow:0 0 0 4px rgba(154,124,46,.35),0 3px 12px rgba(0,0,0,.3)}
 .pick img{display:block;width:100%;height:auto;pointer-events:none}
-.pick .cap{
-  padding:3px 5px 4px;font-size:10.5px;font-weight:700;text-align:center;
-  color:#111;border-top:2px solid #111;background:#fff;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
 .pick.done{
   cursor:default;padding:16px 10px;text-align:center;
   font-size:13px;font-weight:700;color:var(--acc2);background:#fff;
@@ -139,13 +134,11 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
 
 .statusbar{
   flex-shrink:0;background:var(--s1);border-top:1px solid var(--line);
-  padding:6px 16px;font-size:11.5px;color:var(--t2);
+  padding:6px 16px;font-size:11.5px;color:var(--t2);line-height:1.5;
 }
-.notebar{
-  flex-shrink:0;background:var(--s2);border-top:1px solid var(--line);
-  padding:5px 16px;font-size:11px;color:var(--t3);line-height:1.5;
-}
-.notebar b{color:var(--t2);font-weight:600}
+.statusbar .note{color:var(--t3);font-size:11px}
+.statusbar .note::before{content:'·';margin:0 7px;color:var(--line)}
+.statusbar .note b{color:var(--t2);font-weight:600}
 
 @media (max-width:520px){
   .topbar{padding:8px 10px;gap:7px}
@@ -181,8 +174,7 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
   </div>
 </div>
 
-<div class="statusbar" id="sb">준비</div>
-<div class="notebar">남캐 · 여캐 버튼은 <b>염마정(참새 여관 활동일지)</b>의 남탕 · 여탕 출격 기준입니다. 양쪽 다 되는 서번트는 두 목록에 모두 나옵니다.</div>
+<div class="statusbar"><span id="sb">준비</span><span class="note">남캐 · 여캐 버튼은 <b>염마정</b>(참새 여관 활동일지)의 남탕 · 여탕 출격 기준.</span></div>
 
 <script>
 'use strict';
@@ -321,11 +313,7 @@ function renderPick(){
   img.src = FACE(s[0]);
   img.alt = s[2];
   img.crossOrigin = 'anonymous';
-  const cap = document.createElement('div');
-  cap.className = 'cap';
-  cap.textContent = s[2];
   p.appendChild(img);
-  p.appendChild(cap);
 }
 
 /* ═══ 배치 ═══ */
