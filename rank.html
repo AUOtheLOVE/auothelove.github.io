@@ -110,7 +110,9 @@ a.btn{display:inline-block;text-decoration:none;vertical-align:middle}
 /* 상단 캐릭터 카드 */
 .pick{
   position:absolute;z-index:4;
-  left:50%;top:3%;transform:translateX(-30%);
+  /* transform 대신 left 로 위치를 잡는다 — html2canvas 가 scale>1 에서
+     translateX 걸린 요소의 내용을 밀어 그려 흰 여백이 생겼다 (2026-09-06) */
+  left:42.2%;top:3%;
   width:26%;min-width:92px;max-width:190px;
   background:#fff;border:3px solid #111;border-radius:4px;
   box-shadow:0 3px 12px rgba(0,0,0,.3);
