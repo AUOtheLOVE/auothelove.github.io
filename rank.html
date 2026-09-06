@@ -157,8 +157,7 @@ a.btn{display:inline-block;line-height:17px;text-decoration:none;vertical-align:
   <div id="stage">
     <div id="bgEmpty">
       <div style="font-size:30px;line-height:1">🖼</div>
-      <div>여기에 PNG · JPG를 끌어다 놓거나<br/><b>이미지 올리기</b>를 누르세요</div>
-      <div style="font-size:11px;color:var(--t3)">붙여넣기(Ctrl+V)도 됩니다</div>
+      <div>이미지 끌어올리기 <span style="color:var(--t3)">(Ctrl+V 가능)</span></div>
     </div>
     <img id="bgImg" alt="" hidden/>
     <div class="slots" id="slots"></div>
@@ -212,7 +211,7 @@ function roll(){
   placed = new Array(N_SLOT).fill(null);
   renderSlots();
   renderPick();
-  sb(`전체 ${POOL.length}기 중 랜덤 ${N_SLOT}기. 위 카드를 끌어서 왼쪽 순번에 넣으세요. (한 번 넣으면 못 바꿉니다)`);
+  sb(`전체 ${POOL.length}기(JP) 중 랜덤 ${N_SLOT}기. 순위로 드래그 하면 됩니다.`);
 }
 
 /* ═══ 슬롯 ═══ */
