@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>순위 매기기</title>
+<meta name="theme-color" content="#f7f5f0"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}   /* display:flex 가 UA의 [hidden] 을 이겨서 생기는 겹침 방지 */
+
+:root{
+  --bg:   #f7f5f0;
+  --s1:   #ffffff;
+  --s2:   #f0ede8;
+  --s3:   #e8e4de;
+  --line: #ddd9d2;
+  --t1:   #1a1814;
+  --t2:   #6b6660;
+  --t3:   #aaa49e;
+  --acc:  #9a7c2e;
+  --acc2: #7a5e1e;
+}
+
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--t1);
+  font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic','Segoe UI',system-ui,sans-serif;
+  font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;
+  overscroll-behavior:none;
+}
+
+/* ── 상단바 ── */
+.topbar{
+  background:var(--s1);border-bottom:1px solid var(--line);
+  padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;
+  flex-wrap:wrap;
+}
+.topbar h1{font-size:14px;font-weight:600;color:var(--t1);letter-spacing:.02em}
+.topbar h1 span{color:var(--acc)}
+
+.btn{
+  background:var(--s2);color:var(--t1);
+  border:1px solid var(--line);border-radius:4px;
+  padding:5px 12px;font-size:12px;cursor:pointer;
+  white-space:nowrap;transition:background .1s,border-color .1s;
+}
+.btn:hover{background:var(--s3);border-color:var(--t3)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:disabled:hover{background:var(--s2);border-color:var(--line)}
+.btn.save{border-color:var(--acc);color:var(--acc)}
+.btn.save:hover:not(:disabled){background:var(--acc);color:#fff}
+
+/* ── 무대 ── */
+.scroll{
+  flex:1;overflow:auto;padding:12px 14px 16px;
+  display:flex;justify-content:center;align-items:flex-start;
+}
+
+#stage{
+  position:relative;width:100%;max-width:720px;
+  background:var(--s1);border:1px solid var(--line);border-radius:6px;
+  overflow:hidden;
+}
+#stage.drop-hot{border-color:var(--acc);box-shadow:0 0 0 3px rgba(154,124,46,.18)}
+
+/* 배경 이미지 */
+#bgImg{display:block;width:100%;height:auto}
+/* 가로로 넓은 그림은 세로 액자에 통째로 넣는다 (10칸이 들어가야 하므로) */
+#stage.short{aspect-ratio:5/6;background:#20242b}
+#stage.short #bgImg{width:100%;height:100%;object-fit:contain}
+
+#bgEmpty{
+  aspect-ratio:3/4;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;
+  color:var(--t3);font-size:13px;text-align:center;padding:24px 24px 24px 22%;
+  background:repeating-linear-gradient(45deg,#fbfaf7,#fbfaf7 10px,#f4f1ec 10px,#f4f1ec 20px);
+}
+
+/* 좌측 순번 줄 — 칸은 항상 정사각형, 서로 딱 붙는다. 크기는 JS가 무대에 맞춰 잡는다 */
+.slots{
+  position:absolute;left:1.8%;top:1.6%;
+  display:flex;flex-direction:column;justify-content:flex-start;
+  align-items:flex-start;gap:0;z-index:3;
+}
+.slot{
+  position:relative;flex:0 0 auto;
+  width:56px;height:56px;
+  background:#fff;border:3px solid #111;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  font-weight:800;color:#111;line-height:1;
+  box-shadow:0 1px 3px rgba(0,0,0,.22);
+}
+.slot.hot{border-color:var(--acc);box-shadow:0 0 0 4px rgba(154,124,46,.35)}
+.slot img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* 상단 캐릭터 카드 */
+.pick{
+  position:absolute;z-index:4;
+  left:50%;top:3%;transform:translateX(-30%);
+  width:36%;min-width:118px;max-width:260px;
+  background:#fff;border:3px solid #111;border-radius:4px;
+  box-shadow:0 3px 12px rgba(0,0,0,.3);
+  cursor:grab;touch-action:none;user-select:none;
+  overflow:hidden;
+}
+.pick:active{cursor:grabbing}
+.pick.armed{border-color:var(--acc);box-shadow:0 0 0 4px rgba(154,124,46,.35),0 3px 12px rgba(0,0,0,.3)}
+.pick img{display:block;width:100%;height:auto;pointer-events:none}
+.pick .cap{
+  padding:4px 6px 5px;font-size:11px;font-weight:700;text-align:center;
+  color:#111;border-top:2px solid #111;background:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.pick.done{
+  cursor:default;padding:16px 10px;text-align:center;
+  font-size:13px;font-weight:700;color:var(--acc2);background:#fff;
+}
+
+/* 끌기 중 따라다니는 유령 */
+#ghost{
+  position:fixed;z-index:999;pointer-events:none;
+  width:90px;height:90px;border:3px solid var(--acc);border-radius:7px;overflow:hidden;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);background:#fff;
+  transform:translate(-50%,-50%);opacity:.94;
+}
+#ghost img{display:block;width:100%;height:100%;object-fit:cover}
+
+.statusbar{
+  flex-shrink:0;background:var(--s1);border-top:1px solid var(--line);
+  padding:6px 16px;font-size:11.5px;color:var(--t2);
+}
+
+@media (max-width:520px){
+  .topbar{padding:8px 10px;gap:7px}
+  .scroll{padding:12px 8px 30px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>FGO <span>순위 매기기</span></h1>
+  <a class="btn" href="./" style="text-decoration:none" title="도구 모음">☰ Home</a>
+  <button class="btn" onclick="document.getElementById('file').click()">이미지 올리기</button>
+  <input type="file" id="file" accept="image/png,image/jpeg,image/webp" hidden onchange="onFile(this.files[0])"/>
+  <button class="btn save" id="btnPng" onclick="exportPNG()" style="margin-left:auto" disabled>PNG 저장</button>
+</div>
+
+<div class="scroll" id="scroll">
+  <div id="stage">
+    <div id="bgEmpty">
+      <div style="font-size:30px;line-height:1">🖼</div>
+      <div>여기에 PNG · JPG를 끌어다 놓거나<br/><b>이미지 올리기</b>를 누르세요</div>
+      <div style="font-size:11px;color:var(--t3)">붙여넣기(Ctrl+V)도 됩니다</div>
+    </div>
+    <img id="bgImg" alt="" hidden/>
+    <div class="slots" id="slots"></div>
+    <div class="pick" id="pick" hidden></div>
+  </div>
+</div>
+
+<div class="statusbar" id="sb">준비</div>
+
+<script>
+'use strict';
+
+/* ═══ 상수 ═══ */
+const N_SLOT = 10;
+const FACE = id => `https://static.atlasacademy.io/JP/Faces/f_${id}0.png`;
+const LS_BG = 'fgorank.bg';
+
+/* ═══ 상태 ═══ */
+let POOL = [];          // svt.json 전체
+let queue = [];         // 이번 판 10기
+let qi = 0;             // 지금 내밀고 있는 순번
+let placed = new Array(N_SLOT).fill(null);
+
+const $ = id => document.getElementById(id);
+const sb = t => { $('sb').textContent = t; };
+
+/* ═══ 시작 ═══ */
+(async function init(){
+  buildSlots();
+  fit();
+  restore();
+  try {
+    const r = await fetch('data/svt.json?v=1', {cache:'no-store'});
+    POOL = await r.json();
+  } catch(e) {
+    sb('서번트 목록을 불러오지 못했습니다: ' + e.message);
+    return;
+  }
+  roll();
+})();
+
+/* 랜덤 10기 (전체 풀에서, 중복 없음) */
+function roll(){
+  const a = POOL.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  queue = a.slice(0, N_SLOT);
+  qi = 0;
+  placed = new Array(N_SLOT).fill(null);
+  renderSlots();
+  renderPick();
+  sb(`전체 ${POOL.length}기 중 랜덤 ${N_SLOT}기. 위 카드를 끌어서 왼쪽 순번에 넣으세요. (한 번 넣으면 못 바꿉니다)`);
+}
+
+/* ═══ 슬롯 ═══ */
+function buildSlots(){
+  const w = $('slots');
+  w.innerHTML = '';
+  for (let i = 0; i < N_SLOT; i++) {
+    const d = document.createElement('div');
+    d.className = 'slot';
+    d.dataset.i = i;
+    w.appendChild(d);
+  }
+}
+
+/* 무대를 화면 안에 들어오게 줄이고, 칸을 정사각형으로 다시 잡는다 */
+function fit(){
+  const im = $('bgImg');
+  const short = $('stage').classList.contains('short');
+  const ratio = short ? 6/5
+              : (!im.hidden && im.naturalWidth) ? im.naturalHeight / im.naturalWidth
+              : 4/3;
+  const wrap = $('scroll');
+  const availW = Math.min(720, wrap.clientWidth - 28);
+  const availH = wrap.clientHeight - 28;
+  const w = Math.max(280, Math.min(availW, availH / ratio));
+  $('stage').style.width = Math.floor(w) + 'px';
+  layout();
+}
+
+function layout(){
+  const st = $('stage').getBoundingClientRect();
+  if (!st.width || !st.height) return;
+  const size = Math.max(26, Math.min(st.width * 0.18, (st.height * 0.968) / N_SLOT));
+  [...$('slots').children].forEach(el => {
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.fontSize = Math.round(size * 0.44) + 'px';
+    el.style.borderWidth = (size < 46 ? 2 : 3) + 'px';
+    el.style.borderRadius = Math.round(size * 0.12) + 'px';
+  });
+}
+window.addEventListener('resize', fit);
+
+function renderSlots(){
+  [...$('slots').children].forEach((el, i) => {
+    const s = placed[i];
+    if (!s) { el.textContent = String(i + 1); el.removeAttribute('title'); return; }
+    el.textContent = '';
+    const img = document.createElement('img');
+    img.src = FACE(s[0]);
+    img.alt = s[2];
+    img.crossOrigin = 'anonymous';
+    el.appendChild(img);
+    el.title = `${i + 1}. ${s[2]} (★${s[3]})`;
+  });
+}
+
+/* ═══ 지금 카드 ═══ */
+function renderPick(){
+  const p = $('pick');
+  if (qi >= queue.length) {
+    p.hidden = false;
+    p.classList.remove('armed');
+    p.classList.add('done');
+    p.innerHTML = '완료 ✓<br/><span style="font-weight:500;font-size:11px;color:#6b6660">새로 하려면 새로고침</span>';
+    $('btnPng').disabled = false;
+    sb('10명 다 넣었습니다. PNG로 저장하세요. (다시 하려면 새로고침 — 캐릭터는 새로 뽑힙니다)');
+    return;
+  }
+  const s = queue[qi];
+  p.hidden = false;
+  p.classList.remove('done');
+  p.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = FACE(s[0]);
+  img.alt = s[2];
+  img.crossOrigin = 'anonymous';
+  const cap = document.createElement('div');
+  cap.className = 'cap';
+  cap.textContent = `${s[2]} ★${s[3]}`;
+  p.appendChild(img);
+  p.appendChild(cap);
+}
+
+/* ═══ 배치 ═══ */
+function place(slotIdx){
+  if (qi >= queue.length) return false;
+  if (slotIdx == null || slotIdx < 0 || slotIdx >= N_SLOT) return false;
+  if (placed[slotIdx]) { sb(`${slotIdx + 1}번은 이미 찼습니다.`); return false; }
+  placed[slotIdx] = queue[qi];
+  const name = queue[qi][2];
+  qi++;
+  renderSlots();
+  renderPick();
+  if (qi < queue.length) sb(`${slotIdx + 1}번 = ${name} · 남은 ${queue.length - qi}명`);
+  return true;
+}
+
+/* ═══ 끌기 (포인터 = 마우스·터치 공통) ═══ */
+let dragging = false, ghost = null, armed = false;
+
+$('pick').addEventListener('pointerdown', e => {
+  if (qi >= queue.length) return;
+  e.preventDefault();
+  dragging = true;
+  try { $('pick').setPointerCapture(e.pointerId); } catch(err) {}
+  ghost = document.createElement('div');
+  ghost.id = 'ghost';
+  const im = document.createElement('img');
+  im.src = FACE(queue[qi][0]);
+  ghost.appendChild(im);
+  document.body.appendChild(ghost);
+  moveGhost(e.clientX, e.clientY);
+});
+
+$('pick').addEventListener('pointermove', e => {
+  if (!dragging) return;
+  moveGhost(e.clientX, e.clientY);
+  hot(slotAt(e.clientX, e.clientY));
+});
+
+$('pick').addEventListener('pointerup', e => {
+  if (!dragging) return;
+  dragging = false;
+  const el = slotAt(e.clientX, e.clientY);
+  hot(null);
+  if (ghost) { ghost.remove(); ghost = null; }
+  if (el) {
+    place(+el.dataset.i);
+    armed = false; $('pick').classList.remove('armed');
+  } else {
+    // 안 옮겼으면 = 그냥 누른 것 → 찍어서 넣기 모드
+    armed = !armed;
+    $('pick').classList.toggle('armed', armed);
+    if (armed) sb('넣을 순번을 누르세요. (다시 카드를 누르면 취소)');
+  }
+});
+
+$('pick').addEventListener('pointercancel', () => {
+  dragging = false; hot(null);
+  if (ghost) { ghost.remove(); ghost = null; }
+});
+
+/* 찍어서 넣기 */
+$('slots').addEventListener('click', e => {
+  const el = e.target.closest('.slot');
+  if (!el || !armed) return;
+  if (place(+el.dataset.i)) { armed = false; $('pick').classList.remove('armed'); }
+});
+
+function moveGhost(x, y){
+  if (!ghost) return;
+  ghost.style.left = x + 'px';
+  ghost.style.top = y + 'px';
+}
+function slotAt(x, y){
+  const el = document.elementFromPoint(x, y);
+  const s = el && el.closest ? el.closest('.slot') : null;
+  return (s && !placed[+s.dataset.i]) ? s : null;
+}
+let lastHot = null;
+function hot(el){
+  if (lastHot === el) return;
+  if (lastHot) lastHot.classList.remove('hot');
+  if (el) el.classList.add('hot');
+  lastHot = el;
+}
+
+/* ═══ 배경 이미지 ═══ */
+function onFile(f){
+  if (!f) return;
+  if (!/^image\//.test(f.type)) { sb('이미지 파일만 됩니다.'); return; }
+  const fr = new FileReader();
+  fr.onload = () => setBg(fr.result, true);
+  fr.onerror = () => sb('파일을 읽지 못했습니다.');
+  fr.readAsDataURL(f);
+}
+
+function setBg(dataUrl, save){
+  const img = $('bgImg');
+  img.onload = () => {
+    img.hidden = false;
+    $('bgEmpty').hidden = true;
+    // 세로로 충분히 길지 않으면 세로 액자에 넣는다 (10칸이 들어가야 함)
+    $('stage').classList.toggle('short', img.naturalHeight / img.naturalWidth < 1.15);
+    fit();
+    if (save) shrinkAndStore(img);
+    sb('이미지 적용됨.');
+  };
+  img.onerror = () => sb('이미지를 표시하지 못했습니다.');
+  img.src = dataUrl;
+}
+
+/* localStorage에는 축소본만 넣는다 (용량 초과 방지) */
+function shrinkAndStore(img){
+  try {
+    const MAX = 1400;
+    const r = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * r);
+    c.height = Math.round(img.naturalHeight * r);
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    localStorage.setItem(LS_BG, c.toDataURL('image/jpeg', 0.9));
+  } catch(e) { /* 저장 실패는 무시 */ }
+}
+
+function restore(){
+  try {
+    const b = localStorage.getItem(LS_BG);
+    if (b) setBg(b, false);
+  } catch(e) {}
+}
+
+/* 끌어다 놓기 */
+const stage = $('stage');
+['dragenter','dragover'].forEach(t => stage.addEventListener(t, e => {
+  e.preventDefault(); stage.classList.add('drop-hot');
+}));
+['dragleave','drop'].forEach(t => stage.addEventListener(t, e => {
+  e.preventDefault(); stage.classList.remove('drop-hot');
+}));
+stage.addEventListener('drop', e => {
+  const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) onFile(f);
+});
+
+/* 붙여넣기 */
+window.addEventListener('paste', e => {
+  const it = [...(e.clipboardData ? e.clipboardData.items : [])].find(i => i.type.startsWith('image/'));
+  if (it) onFile(it.getAsFile());
+});
+
+/* ═══ PNG 저장 ═══ */
+async function exportPNG(){
+  sb('PNG 생성 중…');
+  const armedWas = armed;
+  armed = false; $('pick').classList.remove('armed');
+  const pickWasHidden = $('pick').hidden;
+  $('pick').hidden = true;              // 완료 카드는 결과물에서 뺀다
+  try {
+    // 외부 CDN 이미지를 dataURL로 바꿔야 canvas가 오염되지 않음
+    const imgs = stage.querySelectorAll('img');
+    await Promise.allSettled([...imgs].map(async im => {
+      if (!im.src || im.src.startsWith('data:')) return;
+      try {
+        const r = await fetch(im.src, {mode:'cors'});
+        const blob = await r.blob();
+        im.src = await new Promise((res, rej) => {
+          const fr = new FileReader();
+          fr.onload = () => res(fr.result); fr.onerror = rej;
+          fr.readAsDataURL(blob);
+        });
+      } catch(err) {}
+    }));
+    const canvas = await html2canvas(stage, {
+      backgroundColor:'#ffffff', scale:2, useCORS:true, allowTaint:false, logging:false
+    });
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const a = document.createElement('a');
+    a.download = `FGO_순위_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    sb('PNG 저장 완료 ✓');
+  } catch(e) {
+    sb('오류: ' + e.message);
+  } finally {
+    $('pick').hidden = pickWasHidden;
+    armed = armedWas;
+    if (armed) $('pick').classList.add('armed');
+  }
+}
+
+window.onFile = onFile;
+window.exportPNG = exportPNG;
+</script>
+</body>
+</html>
